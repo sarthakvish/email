@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
+from email_app.models.user_models import CompanyProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -36,6 +37,7 @@ class UserSerializerWithToken(UserSerializer):
         token = RefreshToken.for_user(obj)
         return str(token.access_token)
 
+
 #
 # class ReviewSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -67,35 +69,14 @@ class UserSerializerWithToken(UserSerializer):
 #         fields = '__all__'
 #
 #
-# class OrderSerializer(serializers.ModelSerializer):
-#     orderItems = serializers.SerializerMethodField(read_only=True)
-#     shippingAddress = serializers.SerializerMethodField(read_only=True)
-#     user = serializers.SerializerMethodField(read_only=True)
-#
-#     class Meta:
-#         model = Order
-#         fields = '__all__'
-#
-#     def get_orderItems(self, obj):
-#         items = obj.orderitem_set.all()
-#         serializer = OrderItemSerializer(items, many=True)
-#         return serializer.data
-#
-#     # object is order model, hum order us perticular order se related jitne
-#     # orderitme hai unhe get karke serialize kr rhe, since field is one to many between order item and order
-#     # so usin set all method. if one to one so direct obj. orderitme kar skete the.
-#
-#     def get_shippingAddress(self, obj):
-#         try:
-#             address = ShippingAddressSerializer(obj.shippingaddress, many=False).data
-#             return address
-#
-#         except:
-#             address = False
-#
-#         return address
-#
-#     def get_user(self, obj):
-#         user = obj.user
-#         serializer = UserSerializer(user, many=False)
-#         return serializer.data
+class CompanyProfileSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = CompanyProfile
+        fields = '__all__'
+
+    def get_user(self, obj):
+        user = obj.user
+        serializer = UserSerializer(user, many=False)
+        return serializer.data
