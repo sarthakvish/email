@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from email_app.models.user_models import CompanyProfile
+from email_app.models.subscribers_models import Subscribers
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -80,3 +81,10 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
         user = obj.user
         serializer = UserSerializer(user, many=False)
         return serializer.data
+
+
+class SubscribersSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subscribers
+        fields = '__all__'
