@@ -1,5 +1,5 @@
 from django.contrib import admin
-from email_app.models.user_models import CompanyProfile
+from email_app.models.user_models import CompanyProfile, StaffUsers
 from email_app.models.subscribers_models import Subscribers
 
 
@@ -15,5 +15,10 @@ class SubscribersAdmin(admin.ModelAdmin):
     list_display = ['name', 'email']
 
 
+# class StaffAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'email']
+
+
 admin.site.register(CompanyProfile, CompanyProfileAdmin)
 admin.site.register(Subscribers, SubscribersAdmin)
+admin.site.register(StaffUsers)

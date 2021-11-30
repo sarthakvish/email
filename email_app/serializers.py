@@ -84,7 +84,25 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
 
 
 class SubscribersSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Subscribers
         fields = '__all__'
+
+
+class StaffProfileSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+    company_id = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = CompanyProfile
+        fields = '__all__'
+
+    def get_user(self, obj):
+        user = obj.user
+        serializer = UserSerializer(user, many=False)
+        return serializer.data
+
+    def get_company_id(self, obj):
+        company_id = obj.company_id
+        serializer = CompanyProfileSerializer(company_id, many=False)
+        return serializer.data
