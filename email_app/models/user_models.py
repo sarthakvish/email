@@ -18,15 +18,22 @@ class CompanyProfile(models.Model):
 class StaffUsers(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     company_id = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
+    unverified_staff_email = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
+    ADMINISTRATOR = 0
+    CAMPAIGN_MANAGER = 1
+    VIEWER = 2
+    ROLLS_CHOICES = (
+        (ADMINISTRATOR, 'administrator'),
+        (CAMPAIGN_MANAGER, 'campaign_manager'),
+    )
+    role_status = models.IntegerField(default=2, choices=ROLLS_CHOICES)
 
     PENDING = 0
     INVITED = 1
-    ACTIVE = 2
     STATUS_CHOICES = (
         (PENDING, 'Pending'),
         (INVITED, 'Invited'),
-        (ACTIVE, 'Active'),
     )
     staff_status = models.IntegerField(default=0, choices=STATUS_CHOICES)

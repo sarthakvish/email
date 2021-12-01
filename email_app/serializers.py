@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from email_app.models.user_models import CompanyProfile
+from email_app.models.user_models import CompanyProfile, StaffUsers
 from email_app.models.subscribers_models import Subscribers
 
 
@@ -75,11 +75,11 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CompanyProfile
-        fields = '__all__'
+        fields = ['id', 'company_id', 'role_status', 'staff_status']
 
     def get_user(self, obj):
         user = obj.user
-        serializer = UserSerializer(user, many=False)
+        serializer = UserSerializerWithToken(user, many=False)
         return serializer.data
 
 
@@ -105,4 +105,17 @@ class StaffProfileSerializer(serializers.ModelSerializer):
     def get_company_id(self, obj):
         company_id = obj.company_id
         serializer = CompanyProfileSerializer(company_id, many=False)
+        return serializer.data
+
+
+class StaffSerializerWithUser(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = StaffUsers
+        fields = "__all__"
+
+    def get_user(self, obj):
+        user = obj.user
+        serializer = UserSerializerWithToken(user, many=False)
         return serializer.data
