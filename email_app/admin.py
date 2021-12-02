@@ -15,10 +15,10 @@ class SubscribersAdmin(admin.ModelAdmin):
     list_display = ['name', 'email']
 
 
-# class StaffAdmin(admin.ModelAdmin):
-#     list_display = ['name', 'email']
+class StaffAdmin(admin.ModelAdmin):
+    list_display = ['unverified_staff_email', 'company_id', 'role_status']
 
 
 admin.site.register(CompanyProfile, CompanyProfileAdmin)
 admin.site.register(Subscribers, SubscribersAdmin)
-admin.site.register(StaffUsers)
+admin.site.register(StaffUsers, StaffAdmin)

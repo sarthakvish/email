@@ -23,12 +23,11 @@ class StaffUsers(models.Model):
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
     ADMINISTRATOR = 0
     CAMPAIGN_MANAGER = 1
-    VIEWER = 2
     ROLLS_CHOICES = (
         (ADMINISTRATOR, 'administrator'),
         (CAMPAIGN_MANAGER, 'campaign_manager'),
     )
-    role_status = models.IntegerField(default=2, choices=ROLLS_CHOICES)
+    role_status = models.IntegerField(default=1, choices=ROLLS_CHOICES)
 
     PENDING = 0
     INVITED = 1
@@ -36,4 +35,4 @@ class StaffUsers(models.Model):
         (PENDING, 'Pending'),
         (INVITED, 'Invited'),
     )
-    staff_status = models.IntegerField(default=0, choices=STATUS_CHOICES)
+    staff_status = models.IntegerField(default=1, choices=STATUS_CHOICES)
