@@ -15,6 +15,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
 from email_app.utils import account_activation_token
+from email_app.thread_tasks import EmailThread
 
 
 @api_view(['POST'])
@@ -52,13 +53,13 @@ def createStaffProfile(request):
 
         activate_url = 'http://' + current_site.domain + link
 
-        email = EmailMessage(
+        email_message = EmailMessage(
             email_subject,
             'Hi ' + user.first_name + ', Please the link below to activate your account \n' + activate_url,
             settings.EMAIL_HOST_USER,
             ['sarthakvishwakarma6@gmail.com'],
         )
-        email.send(fail_silently=False)
+        EmailThread(email_message).start()
 
         serializer = StaffSerializerWithUser(staff_profile, many=False)
         return Response(serializer.data)
@@ -78,13 +79,15 @@ def verificationView(request, uidb64, token):
         if user.is_active:
             return redirect('login')
         user.is_active = True
+        print(user.staffusers.staff_status)
+        user.staffusers.staff_status = "VERIFIED"
         user.save()
+        user.staffusers.save()
         return redirect('login')
     except:
         pass
 
     return redirect('login')
-
 
 # @api_view(['POST'])
 # def registerStaffUser(request):

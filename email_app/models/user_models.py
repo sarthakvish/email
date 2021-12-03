@@ -21,18 +21,16 @@ class StaffUsers(models.Model):
     unverified_staff_email = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
-    ADMINISTRATOR = 0
-    CAMPAIGN_MANAGER = 1
-    ROLLS_CHOICES = (
-        (ADMINISTRATOR, 'administrator'),
-        (CAMPAIGN_MANAGER, 'campaign_manager'),
-    )
-    role_status = models.IntegerField(default=1, choices=ROLLS_CHOICES)
 
-    PENDING = 0
-    INVITED = 1
-    STATUS_CHOICES = (
-        (PENDING, 'Pending'),
-        (INVITED, 'Invited'),
+    ROLLS_CHOICES = (
+        ('ADMINISTRATOR', 'administrator'),
+        ('CAMPAIGN_MANAGER', 'campaign_manager'),
     )
-    staff_status = models.IntegerField(default=1, choices=STATUS_CHOICES)
+    role_status = models.CharField(default="CAMPAIGN_MANAGER", choices=ROLLS_CHOICES, max_length=20)
+
+    STATUS_CHOICES = (
+        ('PENDING', 'Pending',),
+        ('INVITED', 'Invited',),
+        ('VERIFIED', 'Verified',),
+    )
+    staff_status = models.CharField(default="INVITED", choices=STATUS_CHOICES,  max_length=15)

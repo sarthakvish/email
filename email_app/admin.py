@@ -16,7 +16,7 @@ class SubscribersAdmin(admin.ModelAdmin):
 
 
 class StaffAdmin(admin.ModelAdmin):
-    list_display = ['unverified_staff_email', 'company_id', 'role_status']
+    list_display = ['unverified_staff_email', 'company_id', 'role_status', 'staff_status']
 
 
 admin.site.register(CompanyProfile, CompanyProfileAdmin)
