@@ -17,7 +17,7 @@ class CompanyProfile(models.Model):
 
 class StaffUsers(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    company_id = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
     unverified_staff_email = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
@@ -34,3 +34,9 @@ class StaffUsers(models.Model):
         ('VERIFIED', 'Verified',),
     )
     staff_status = models.CharField(default="INVITED", choices=STATUS_CHOICES,  max_length=15)
+
+
+class StaffUsersExcelFile(models.Model):
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
+    excel_file_upload = models.FileField(upload_to="excel")
+    isActivated = models.BooleanField(default=False)

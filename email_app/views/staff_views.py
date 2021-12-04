@@ -16,6 +16,9 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
 from email_app.utils import account_activation_token
 from email_app.thread_tasks import EmailThread
+import pandas as pd
+from django.conf import settings
+import uuid
 
 
 @api_view(['POST'])
@@ -88,6 +91,20 @@ def verificationView(request, uidb64, token):
         pass
 
     return redirect('login')
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def exportStaffUser(request):
+    staff_obj = StaffUsers.objects.all()
+    serializer = StaffSerializerWithUser(staff_obj, many=True)
+    df = pd.DataFrame(serializer.data)
+    print(df)
+    df.drop(['created_at', 'updated_at', 'role_status', 'staff_status', 'user', 'company', 'id'],
+            axis=1, inplace=True)
+    df.to_csv(f"public/static/excel/{uuid.uuid4()}.csv", encoding="UTF-8")
+    return Response("done")
+
 
 # @api_view(['POST'])
 # def registerStaffUser(request):
