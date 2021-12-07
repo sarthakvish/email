@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from email_app.models.user_models import CompanyProfile
 from taggit.managers import TaggableManager
+from ckeditor.fields import RichTextField
 
 
 class Subscribers(models.Model):
@@ -32,3 +33,9 @@ class List(models.Model):
     tags = TaggableManager()
 
 
+class Template(models.Model):
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    body = RichTextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
