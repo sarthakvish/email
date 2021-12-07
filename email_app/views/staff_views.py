@@ -106,6 +106,17 @@ def exportStaffUser(request):
     return Response("done")
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getStaff(request):
+    user = request.user
+    company_obj = CompanyProfile.objects.get(user=user)
+    print("hello", company_obj.company_id)
+    staff = StaffUsers.objects.filter(company_id=company_obj.id)
+    # staff = User.objects.all().select_related('staffusers')
+    serializer = StaffSerializerWithUser(staff, many=True)
+    return Response(serializer.data)
+
 # @api_view(['POST'])
 # def registerStaffUser(request):
 #     data = request.data

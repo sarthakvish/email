@@ -1,6 +1,6 @@
 from django.contrib import admin
 from email_app.models.user_models import CompanyProfile, StaffUsers, StaffUsersExcelFile
-from email_app.models.subscribers_models import Subscribers
+from email_app.models.subscribers_models import Subscribers, List
 
 
 # Register your models here.
@@ -27,3 +27,4 @@ admin.site.register(CompanyProfile, CompanyProfileAdmin)
 admin.site.register(Subscribers, SubscribersAdmin)
 admin.site.register(StaffUsers, StaffAdmin)
 admin.site.register(StaffUsersExcelFile, StaffUserExcelFileAdmin)
+admin.site.register(List)

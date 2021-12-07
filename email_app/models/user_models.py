@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 import uuid
 from django.contrib.auth.models import User
@@ -7,6 +8,8 @@ class CompanyProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="company_id")
     company_id = models.UUIDField(default=uuid.uuid4, editable=False)
     company_name = models.CharField(max_length=255, blank=True)
+    phone = models.CharField(max_length=10, blank=True)
+    is_gst_registered = models.BooleanField(default=False)
     gst_details = models.CharField(max_length=255, blank=True)
     address = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -7,5 +7,7 @@ urlpatterns = [
          views.verificationView, name='activate'),
     # path('register_staff/', views.registerStaffUser, name='register_staff'),
     path('export_staff/', views.exportStaffUser, name='export_staff'),
+    path('', views.getStaff, name="staff"),
+
 
 ]
