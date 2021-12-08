@@ -29,7 +29,6 @@ def createStaffProfile(request):
     company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
 
-
     try:
         user = User.objects.create(
             first_name=data['name'],
@@ -114,35 +113,30 @@ def exportStaffUser(request):
 @permission_classes([IsAuthenticated])
 def getStaff(request):
     user = request.user
-    company_obj = CompanyProfile.objects.get(user=user)
-    print("hello", company_obj.company_id)
-    staff = StaffUsers.objects.filter(company_id=company_obj.id)
-    # staff = User.objects.all().select_related('staffusers')
-    serializer = StaffSerializerWithUser(staff, many=True)
-    return Response(serializer.data)
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        print("hello", company_obj.company_id)
+        staff = StaffUsers.objects.filter(company_id=company_obj.id)
+        # staff = User.objects.all().select_related('staffusers')
+        serializer = StaffSerializerWithUser(staff, many=True)
+        return Response(serializer.data)
+    except:
+        message = {'detail': 'Something went wrong'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-# @api_view(['POST'])
-# def registerStaffUser(request):
-#     data = request.data
-#     user = User.objects.create(
-#         first_name=data['name'],
-#         username=data['email'],
-#         email=data['email'],
-#         password=make_password(data['password'])
-#     )
-#     serializer = UserSerializerWithToken(user, many=False)
-#     return Response(serializer.data)
-#     # try:
-#     #     user = User.objects.create(
-#     #         first_name=data['name'],
-#     #         username=data['email'],
-#     #         email=data['email'],
-#     #         password=make_password(data['password'])
-#     #     )
-#     #     user.staffusers.staff_status ="Active"
-#     #     user.save()
-#     #     serializer = UserSerializerWithToken(user, many=False)
-#     #     return Response(serializer.data)
-#     # except:
-#     #     message = {'detail': 'User with this email is already exists'}
-#     #     return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getStaffById(request, pk):
+    user = request.user
+    company_obj = CompanyProfile.objects.get(user=user)
+    try:
+        staff = StaffUsers.objects.get(id=pk)
+        serializer = StaffSerializerWithUser(staff, many=False)
+        return Response(serializer.data)
+    except:
+        message = {'detail': 'User does not exist'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
