@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 
 class CompanyProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="company_id")
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     company_id = models.UUIDField(default=uuid.uuid4, editable=False)
     company_name = models.CharField(max_length=255, blank=True)
     phone = models.CharField(max_length=10, blank=True)

@@ -25,8 +25,11 @@ import uuid
 @permission_classes([IsAuthenticated])
 def createStaffProfile(request):
     user = request.user
+    print('sarthak', user)
     company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
+
+
     try:
         user = User.objects.create(
             first_name=data['name'],
@@ -38,7 +41,7 @@ def createStaffProfile(request):
         user.save()
         staff_profile = StaffUsers.objects.create(
             user=user,
-            company_id=company_obj,
+            company_id=company_obj.pk,
             unverified_staff_email=data['unverified_staff_email'],
         )
         current_site = get_current_site(request)
@@ -66,6 +69,7 @@ def createStaffProfile(request):
 
         serializer = StaffSerializerWithUser(staff_profile, many=False)
         return Response(serializer.data)
+
     except:
         message = {'detail': 'Staff with this email already exists!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
