@@ -105,9 +105,7 @@ def createCompanyProfile(request):
 def updateUser(request, pk):
     try:
         user = User.objects.get(id=pk)
-
         data = request.data
-
         user.first_name = data['name']
         user.username = data['email']
         user.email = data['email']

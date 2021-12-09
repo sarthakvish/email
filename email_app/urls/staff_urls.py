@@ -8,5 +8,6 @@ urlpatterns = [
     path('export_staff/', views.exportStaffUser, name='export_staff'),
     path('', views.getStaff, name="staffs"),
     path('<str:pk>/', views.getStaffById, name="staff"),
+    path('update/<str:pk>', views.updateStaff, name="staff-update"),
 
 ]

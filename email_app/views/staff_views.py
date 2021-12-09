@@ -125,8 +125,6 @@ def getStaff(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getStaffById(request, pk):
@@ -138,5 +136,27 @@ def getStaffById(request, pk):
         return Response(serializer.data)
     except:
         message = {'detail': 'User does not exist'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateStaff(request, pk):
+    try:
+        staff = StaffUsers.objects.get(id=pk)
+        data = request.data
+        print(staff.user.username)
+        staff.user.first_name = data['name']
+        staff.user.username = data['email']
+        staff.is_staff = data['isAdmin']
+
+        staff.save()
+
+        serializer = StaffSerializerWithUser(staff, many=False)
+
+        return Response(serializer.data)
+
+    except:
+        message = {'detail': 'Please verify the details!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 

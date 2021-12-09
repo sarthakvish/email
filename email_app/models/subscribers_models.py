@@ -39,3 +39,19 @@ class Template(models.Model):
     body = RichTextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+
+class Campaigns(models.Model):
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    subject = models.CharField(max_length=255)
+    from_email = models.CharField(max_length=255)
+    MESSENGER_CHOICES = (
+        ('EMAIL', 'Email'),
+    )
+    list = models.ManyToManyField(List)
+    messenger = models.CharField(default="EMAIL", choices=MESSENGER_CHOICES, max_length=20)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
+    tags = TaggableManager()
