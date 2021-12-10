@@ -36,7 +36,10 @@ class StaffUsers(models.Model):
         ('INVITED', 'Invited',),
         ('VERIFIED', 'Verified',),
     )
-    staff_status = models.CharField(default="INVITED", choices=STATUS_CHOICES,  max_length=15)
+    staff_status = models.CharField(default="INVITED", choices=STATUS_CHOICES, max_length=15)
+
+    def __str__(self):
+        return self.user.username
 
 
 class StaffUsersExcelFile(models.Model):

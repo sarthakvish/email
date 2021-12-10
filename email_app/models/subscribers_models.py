@@ -18,6 +18,9 @@ class Subscribers(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
 
+    def __str__(self):
+        return self.name
+
 
 class List(models.Model):
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
@@ -32,6 +35,9 @@ class List(models.Model):
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
     tags = TaggableManager()
 
+    def __str__(self):
+        return self.name
+
 
 class Template(models.Model):
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
@@ -39,6 +45,9 @@ class Template(models.Model):
     body = RichTextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Campaigns(models.Model):
@@ -55,3 +64,6 @@ class Campaigns(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
     tags = TaggableManager()
+
+    def __str__(self):
+        return self.name

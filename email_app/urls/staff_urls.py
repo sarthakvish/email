@@ -9,5 +9,6 @@ urlpatterns = [
     path('', views.getStaff, name="staffs"),
     path('<str:pk>/', views.getStaffById, name="staff"),
     path('update/<str:pk>', views.updateStaff, name="staff-update"),
+    path('delete/<str:pk>', views.deleteStaff, name="staff-delete"),
 
 ]

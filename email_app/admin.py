@@ -23,10 +23,14 @@ class StaffUserExcelFileAdmin(admin.ModelAdmin):
     list_display = ['company', 'excel_file_upload', 'isActivated']
 
 
+class CampaignAdmin(admin.ModelAdmin):
+    list_display = ['name', 'subject', 'from_email']
+
+
 admin.site.register(CompanyProfile, CompanyProfileAdmin)
 admin.site.register(Subscribers, SubscribersAdmin)
 admin.site.register(StaffUsers, StaffAdmin)
 admin.site.register(StaffUsersExcelFile, StaffUserExcelFileAdmin)
 admin.site.register(List)
 admin.site.register(Template)
-admin.site.register(Campaigns)
+admin.site.register(Campaigns, CampaignAdmin)

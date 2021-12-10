@@ -160,3 +160,11 @@ def updateStaff(request, pk):
         message = {'detail': 'Please verify the details!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def deleteStaff(request, pk):
+    staffForDeletion = StaffUsers.objects.get(id=pk)
+    staffForDeletion.delete()
+    return Response('Staff was deleted')
+
