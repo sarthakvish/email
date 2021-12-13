@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from email_app.models.user_models import CompanyProfile, StaffUsers
-from email_app.models.subscribers_models import Subscribers
+from email_app.models.subscribers_models import Subscribers, Template
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -39,37 +39,6 @@ class UserSerializerWithToken(UserSerializer):
         return str(token.access_token)
 
 
-#
-# class ReviewSerializer(serializers.ModelSerializer):
-#     class Meta:
-#
-#         fields = '__all__'
-#
-#
-# class ProductSerializer(serializers.ModelSerializer):
-#     reviews = serializers.SerializerMethodField(read_only=True) # adding extrafield, product k sath sath
-#
-#     class Meta:
-#
-#         fields = '__all__'
-#
-#     def get_reviews(self, obj):
-#         reviews = obj.review_set.all()
-#         serializer = ReviewSerializer(reviews, many=True)
-#         return serializer.data
-#
-#
-# class ShippingAddressSerializer(serializers.ModelSerializer):
-#     class Meta:
-#
-#         fields = '__all__'
-#
-#
-# class OrderItemSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         fields = '__all__'
-#
-#
 class CompanyProfileSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField(read_only=True)
 
@@ -119,3 +88,9 @@ class StaffSerializerWithUser(serializers.ModelSerializer):
         user = obj.user
         serializer = UserSerializer(user, many=False)
         return serializer.data
+
+
+class TemplatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Template
+        fields = '__all__'

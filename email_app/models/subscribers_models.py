@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from email_app.models.user_models import CompanyProfile
 from taggit.managers import TaggableManager
 from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class Subscribers(models.Model):
@@ -42,7 +43,10 @@ class List(models.Model):
 class Template(models.Model):
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    body = RichTextField()
+    body = RichTextUploadingField()
+    discription = models.TextField(default="hello")
+    template = models.FileField(upload_to="templates/email")
+    is_default = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
 
