@@ -1,16 +1,14 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.views import View
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from email_app.models.user_models import StaffUsers, CompanyProfile
 from rest_framework import status
-from email_app.serializers import UserSerializerWithToken, StaffSerializerWithUser, StaffProfileSerializer
+from email_app.serializers import StaffSerializerWithUser
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
-from django.core.mail import EmailMessage
-from django.conf import settings
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
@@ -19,6 +17,7 @@ from email_app.thread_tasks import EmailThread
 import pandas as pd
 from django.conf import settings
 import uuid
+from django.template.loader import render_to_string
 
 
 @api_view(['POST'])
@@ -43,6 +42,7 @@ def createStaffProfile(request):
             company_id=company_obj.pk,
             unverified_staff_email=data['unverified_staff_email'],
         )
+
         current_site = get_current_site(request)
         email_body = {
             'user': user,
@@ -57,13 +57,16 @@ def createStaffProfile(request):
         email_subject = 'Activate your account'
 
         activate_url = 'http://' + current_site.domain + link
+        html = render_to_string("register.html", {"activate_url": activate_url, "user": user.first_name})
 
-        email_message = EmailMessage(
+        email_message = EmailMultiAlternatives(
             email_subject,
             'Hi ' + user.first_name + ', Please the link below to activate your account \n' + activate_url,
             settings.EMAIL_HOST_USER,
             ['sarthakvishwakarma6@gmail.com'],
+
         )
+        email_message.attach_alternative(html, "text/html")
         EmailThread(email_message).start()
 
         serializer = StaffSerializerWithUser(staff_profile, many=False)
@@ -167,4 +170,3 @@ def deleteStaff(request, pk):
     staffForDeletion = StaffUsers.objects.get(id=pk)
     staffForDeletion.delete()
     return Response('Staff was deleted')
-
