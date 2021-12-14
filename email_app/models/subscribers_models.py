@@ -31,7 +31,7 @@ class List(models.Model):
         ('PRIVATE', 'Private'),
         ('PUBLIC', 'Public'),
     )
-    list_type = models.CharField(default="ENABLED", choices=LISTS_CHOICES, max_length=20)
+    list_type = models.CharField(default="PUBLIC", choices=LISTS_CHOICES, max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
     tags = TaggableManager()

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from email_app.models.user_models import CompanyProfile, StaffUsers
-from email_app.models.subscribers_models import Subscribers, Template
+from email_app.models.subscribers_models import Subscribers, Template, List, Campaigns
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -93,4 +93,10 @@ class StaffSerializerWithUser(serializers.ModelSerializer):
 class TemplatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Template
+        fields = '__all__'
+
+
+class ListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = List
         fields = '__all__'
