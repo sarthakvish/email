@@ -15,74 +15,20 @@ def createSubscriber(request):
     company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
 
-    subscriber = Subscribers.objects.create(
-        company=company_obj,
-        name=data['name'],
-        email=data['email'],
-        phone=data['phone']
-    )
-    # current_site = get_current_site(request)
-    # email_body = {
-    #     'user': user,
-    #     'domain': current_site.domain,
-    #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-    #     'token': account_activation_token.make_token(user),
-    # }
-    #
-    # link = reverse('activate', kwargs={
-    #     'uidb64': email_body['uid'], 'token': email_body['token']})
-    #
-    # email_subject = 'Activate your account'
-    #
-    # activate_url = 'http://' + current_site.domain + link
-    #
-    # email_message = EmailMessage(
-    #     email_subject,
-    #     'Hi ' + user.first_name + ', Please the link below to activate your account \n' + activate_url,
-    #     settings.EMAIL_HOST_USER,
-    #     ['sarthakvishwakarma6@gmail.com'],
-    # )
-    # EmailThread(email_message).start()
+    try:
+        subscriber = Subscribers.objects.create(
+            company=company_obj,
+            name=data['name'],
+            email=data['email'],
+            phone=data['phone']
+        )
 
-    serializer = SubscribersSerializer(subscriber, many=False)
-    return Response(serializer.data)
+        serializer = SubscribersSerializer(subscriber, many=False)
+        return Response(serializer.data)
 
-    # try:
-    #     subscriber = Subscribers.objects.create(
-    #         company=company_obj.pk,
-    #         name=data['name'],
-    #         email=data['email'],
-    #         phone=data['phone']
-    #     )
-    #     # current_site = get_current_site(request)
-    #     # email_body = {
-    #     #     'user': user,
-    #     #     'domain': current_site.domain,
-    #     #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-    #     #     'token': account_activation_token.make_token(user),
-    #     # }
-    #     #
-    #     # link = reverse('activate', kwargs={
-    #     #     'uidb64': email_body['uid'], 'token': email_body['token']})
-    #     #
-    #     # email_subject = 'Activate your account'
-    #     #
-    #     # activate_url = 'http://' + current_site.domain + link
-    #     #
-    #     # email_message = EmailMessage(
-    #     #     email_subject,
-    #     #     'Hi ' + user.first_name + ', Please the link below to activate your account \n' + activate_url,
-    #     #     settings.EMAIL_HOST_USER,
-    #     #     ['sarthakvishwakarma6@gmail.com'],
-    #     # )
-    #     # EmailThread(email_message).start()
-    #
-    #     serializer = SubscribersSerializer(subscriber, many=False)
-    #     return Response(serializer.data)
-    #
-    # except:
-    #     message = {'detail': 'Staff with this email already exists!'}
-    #     return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    except:
+        message = {'detail': 'Staff with this email already exists!'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])

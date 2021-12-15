@@ -11,6 +11,7 @@ urlpatterns = [
                   path('api/staff/', include('email_app.urls.staff_urls')),
                   path('api/subscribers/', include('email_app.urls.subscribers_urls')),
                   path('api/templates/', include('email_app.urls.templates_urls')),
+                  path('api/lists/', include('email_app.urls.list_urls')),
                   path('__debug__/', include(debug_toolbar.urls)),
                   path('ckeditor/', include('ckeditor_uploader.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

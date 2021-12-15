@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from email_app.models.user_models import CompanyProfile, StaffUsers
 from email_app.models.subscribers_models import Subscribers, Template, List, Campaigns
+from taggit.serializers import (TagListSerializerField,
+                                TaggitSerializer)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -96,7 +98,15 @@ class TemplatesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ListSerializer(serializers.ModelSerializer):
+class ListSerializer(TaggitSerializer, serializers.ModelSerializer):
+    tags = TagListSerializerField()
+    subscriber = SubscribersSerializer(many=True)
+
     class Meta:
         model = List
         fields = '__all__'
+
+    # def get_subscriber(self, obj):
+    #     subscriber = obj.subscriber
+    #     serializer = SubscribersSerializer(subscriber, many=True)
+    #     return serializer.data
