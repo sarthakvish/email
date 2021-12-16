@@ -18,6 +18,8 @@ import pandas as pd
 from django.conf import settings
 import uuid
 from django.template.loader import render_to_string
+from django.contrib.auth.models import Group
+from django.db.models import Q
 
 
 @api_view(['POST'])
@@ -27,6 +29,8 @@ def createStaffProfile(request):
     print('sarthak', user)
     company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
+
+
 
     try:
         user = User.objects.create(
@@ -42,32 +46,35 @@ def createStaffProfile(request):
             company_id=company_obj.pk,
             unverified_staff_email=data['unverified_staff_email'],
         )
+        group = Group.objects.get(name='staffuser')
+        print('group', group)
+        user.groups.add(group)
 
-        current_site = get_current_site(request)
-        email_body = {
-            'user': user,
-            'domain': current_site.domain,
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            'token': account_activation_token.make_token(user),
-        }
-
-        link = reverse('activate', kwargs={
-            'uidb64': email_body['uid'], 'token': email_body['token']})
-
-        email_subject = 'Activate your account'
-
-        activate_url = 'http://' + current_site.domain + link
-        html = render_to_string("register.html", {"activate_url": activate_url, "user": user.first_name})
-
-        email_message = EmailMultiAlternatives(
-            email_subject,
-            'Hi ' + user.first_name + ', Please the link below to activate your account \n' + activate_url,
-            settings.EMAIL_HOST_USER,
-            ['sarthakvishwakarma6@gmail.com'],
-
-        )
-        email_message.attach_alternative(html, "text/html")
-        EmailThread(email_message).start()
+        # current_site = get_current_site(request)
+        # email_body = {
+        #     'user': user,
+        #     'domain': current_site.domain,
+        #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        #     'token': account_activation_token.make_token(user),
+        # }
+        #
+        # link = reverse('activate', kwargs={
+        #     'uidb64': email_body['uid'], 'token': email_body['token']})
+        #
+        # email_subject = 'Activate your account'
+        #
+        # activate_url = 'http://' + current_site.domain + link
+        # html = render_to_string("register.html", {"activate_url": activate_url, "user": user.first_name})
+        #
+        # email_message = EmailMultiAlternatives(
+        #     email_subject,
+        #     'Hi ' + user.first_name + ', Please the link below to activate your account \n' + activate_url,
+        #     settings.EMAIL_HOST_USER,
+        #     ['sarthakvishwakarma6@gmail.com'],
+        #
+        # )
+        # email_message.attach_alternative(html, "text/html")
+        # EmailThread(email_message).start()
 
         serializer = StaffSerializerWithUser(staff_profile, many=False)
         return Response(serializer.data)
@@ -133,9 +140,10 @@ def getStaff(request):
 def getStaffById(request, pk):
     user = request.user
     company_obj = CompanyProfile.objects.get(user=user)
+    # staff = StaffUsers.objects.get(id=pk)
     try:
-        staff = StaffUsers.objects.get(id=pk)
-        serializer = StaffSerializerWithUser(staff, many=False)
+        staff = StaffUsers.objects.filter(Q(id=pk) & Q(company=company_obj))
+        serializer = StaffSerializerWithUser(staff, many=True)
         return Response(serializer.data)
     except:
         message = {'detail': 'User does not exist'}
@@ -145,6 +153,8 @@ def getStaffById(request, pk):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateStaff(request, pk):
+    user = request.user
+    company_obj = CompanyProfile.objects.get(user=user)
     try:
         staff = StaffUsers.objects.get(id=pk)
         data = request.data

@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin']
+        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin',]
 
     def get__id(self, obj):
         return obj.id
@@ -27,6 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         if name == '':
             name = obj.email
         return name
+
 
 
 class UserSerializerWithToken(UserSerializer):
@@ -46,7 +47,7 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CompanyProfile
-        fields = ['id', 'company_id', 'role_status', 'staff_status']
+        fields = ['id', 'company_id', 'company_name', 'address', 'user']
 
     def get_user(self, obj):
         user = obj.user

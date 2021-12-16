@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from email_app.models.subscribers_models import Subscribers
 from email_app.models.user_models import CompanyProfile
 from email_app.serializers import SubscribersSerializer
+from django.contrib.auth.models import User
 
 
 @api_view(['POST'])
@@ -35,6 +36,7 @@ def createSubscriber(request):
 @permission_classes([IsAuthenticated])
 def getSubscribers(request):
     user = request.user
+
     try:
         company_obj = CompanyProfile.objects.get(user=user)
         print("hello", company_obj.company_id)

@@ -14,54 +14,34 @@ def createList(request):
     user = request.user
     company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
-    print('data',data)
+    print('data', data)
 
-    list_instance = List.objects.create(
-        company=company_obj,
-        name=data['name'],
-    )
-    list_instance.save()
-    tag_names = data['tags']
-    print("tagname",tag_names)
-    print("type")
-    print(type(tag_names))
-    for tag_name in tag_names:
-        tag, created = Tag.objects.get_or_create(name=tag_name)
-        print('tag', tag)
-        list_instance.tags.add(tag)
+    try:
+        list_instance = List.objects.create(
+            company=company_obj,
+            name=data['name'],
+        )
         list_instance.save()
-    subscriber_list = data['subscriber']
-    for subscriber in subscriber_list:
-        subscriber = Subscribers.objects.get(name=subscriber)
-        print('subscriber')
-        list_instance.subscriber.add(subscriber)
-    serializer = ListSerializer(list_instance)
-    return Response(serializer.data)
+        tag_names = data['tags']
+        print("tagname", tag_names)
+        print("type")
+        print(type(tag_names))
+        for tag_name in tag_names:
+            tag, created = Tag.objects.get_or_create(name=tag_name)
+            print('tag', tag)
+            list_instance.tags.add(tag)
+            list_instance.save()
+        subscriber_list = data['subscriber']
+        for subscriber in subscriber_list:
+            subscriber = Subscribers.objects.get(name=subscriber)
+            print('subscriber')
+            list_instance.subscriber.add(subscriber)
+        serializer = ListSerializer(list_instance)
+        return Response(serializer.data)
 
-    # try:
-    #     list_instance = List.objects.create(
-    #         company=company_obj,
-    #         name=data['name'],
-    #     )
-    #     list_instance.save()
-    #     tag_names = data['tags']
-    #     print(tag_names)
-    #     for tag_name in tag_names:
-    #         tag, created = Tag.objects.get_or_create(name=tag_name)
-    #         print('tag',tag)
-    #         list_instance.tags.add(tag)
-    #         list_instance.save()
-    #     subscriber_list = data.get('subscriber', [])
-    #     for subscriber in subscriber_list:
-    #         subscriber, created = Subscribers.objects.get_or_create(name=subscriber)
-    #         print('subscriber')
-    #         list_instance.subscriber.add(subscriber)
-    #     serializer = ListSerializer(list_instance)
-    #     return Response(serializer.data)
-    #
-    # except:
-    #     message = {'detail': 'Staff with this email already exists!'}
-    #     return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    except:
+        message = {'detail': 'Staff with this email already exists!'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -76,4 +56,16 @@ def getLists(request):
         return Response(serializer.data)
     except:
         message = {'detail': 'Something went wrong'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+
+def getListById(request, pk):
+    user = request.user
+    company_obj = CompanyProfile.objects.get(user=user)
+    try:
+        list = List.objects.get(id=pk)
+        serializer = ListSerializer(list, many=False)
+        return Response(serializer.data)
+    except:
+        message = {'detail': 'User does not exist'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)

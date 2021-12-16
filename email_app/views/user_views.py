@@ -9,7 +9,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from django.contrib.auth.models import User
 from email_app.models.user_models import CompanyProfile
-
+from django.contrib.auth.models import Group
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -84,17 +84,21 @@ def registerUser(request):
 def createCompanyProfile(request):
     user = request.user
     data = request.data
-
+    group_name = Group.objects.get(user=user)
     try:
-        company_profile = CompanyProfile.objects.create(
-            user=user,
-            company_name=data['company_name'],
-            gst_details=data['gst_details'],
-            address=data['address']
+        if group_name.name == 'staffuser':
+            message = {'detail': 'You are not allowed to create company!'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            company_profile = CompanyProfile.objects.create(
+                user=user,
+                company_name=data['company_name'],
+                gst_details=data['gst_details'],
+                address=data['address']
 
-        )
-        serializer = CompanyProfileSerializer(company_profile, many=False)
-        return Response(serializer.data)
+            )
+            serializer = CompanyProfileSerializer(company_profile, many=False)
+            return Response(serializer.data)
     except:
         message = {'detail': 'Company profile already created!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
