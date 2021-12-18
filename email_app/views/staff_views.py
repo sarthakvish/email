@@ -30,8 +30,6 @@ def createStaffProfile(request):
     company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
 
-
-
     try:
         user = User.objects.create(
             first_name=data['name'],
@@ -135,11 +133,13 @@ def getStaff(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def getStaffById(request, pk):
+def getStaffById(request):
     user = request.user
     company_obj = CompanyProfile.objects.get(user=user)
+    data = request.data
+    pk = data['id']
     # staff = StaffUsers.objects.get(id=pk)
     try:
         staff = StaffUsers.objects.filter(Q(id=pk) & Q(company=company_obj))
@@ -150,33 +150,47 @@ def getStaffById(request, pk):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def updateStaff(request, pk):
+def updateStaff(request):
     user = request.user
     company_obj = CompanyProfile.objects.get(user=user)
+    data = request.data
+    pk = data['id']
+
     try:
-        staff = StaffUsers.objects.get(id=pk)
-        data = request.data
-        print(staff.user.username)
-        staff.user.first_name = data['name']
-        staff.user.username = data['email']
-        staff.is_staff = data['isAdmin']
+        if StaffUsers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            staff = StaffUsers.objects.get(id=pk)
+            data = request.data
+            print('data', data)
+            print(staff.user.last_name)
+            staff.user.first_name = data['first_name']
+            staff.user.last_name = data['last_name']
+            staff.user.save()
+            staff.role_status = data['role_status']
+            staff.save()
 
-        staff.save()
+            serializer = StaffSerializerWithUser(staff, many=False)
 
-        serializer = StaffSerializerWithUser(staff, many=False)
+            return Response(serializer.data)
+        return Response('You do not have permission to update this record ')
 
-        return Response(serializer.data)
 
     except:
         message = {'detail': 'Please verify the details!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def deleteStaff(request, pk):
-    staffForDeletion = StaffUsers.objects.get(id=pk)
-    staffForDeletion.delete()
-    return Response('Staff was deleted')
+def deleteStaff(request):
+    user = request.user
+    company_obj = CompanyProfile.objects.get(user=user)
+    data = request.data
+    pk = data['id']
+    if StaffUsers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+        staffForDeletion = StaffUsers.objects.get(id=pk)
+        print(staffForDeletion)
+        staffForDeletion.delete()
+        return Response('Staff was deleted')
+    return Response('You do not have permission to delete this record')

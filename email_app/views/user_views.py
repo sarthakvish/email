@@ -49,9 +49,11 @@ def getUsers(request):
     return Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAdminUser])
-def getUserById(request, pk):
+def getUserById(request):
+    data = request.data
+    pk = data['id']
     try:
         user = User.objects.get(id=pk)
         serializer = UserSerializer(user, many=False)
@@ -104,9 +106,11 @@ def createCompanyProfile(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def updateUser(request, pk):
+def updateUser(request):
+    data = request.data
+    pk = data['id']
     try:
         user = User.objects.get(id=pk)
         data = request.data

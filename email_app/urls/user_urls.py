@@ -11,7 +11,7 @@ urlpatterns = [
     path('create_company_profile/', views.createCompanyProfile, name='create_company_profile'),
     path('profile/', views.getUserProfile, name="users-profile"),
     path('', views.getUsers, name="users"),
-    path('<str:pk>/', views.getUserById, name="user"),
-    path('update/<str:pk>', views.updateUser, name="user-update"),
+    path('getUserById/', views.getUserById, name="user"),
+    path('updateUserById/', views.updateUser, name="user-update"),
     path('delete/<str:pk>', views.deleteUser, name="user-delete"),
 ]

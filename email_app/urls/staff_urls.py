@@ -7,8 +7,8 @@ urlpatterns = [
          views.verificationView, name='activate'),
     path('export_staff/', views.exportStaffUser, name='export_staff'),
     path('', views.getStaff, name="staffs"),
-    path('<str:pk>/', views.getStaffById, name="staff"),
-    path('update/<str:pk>', views.updateStaff, name="staff-update"),
-    path('delete/<str:pk>', views.deleteStaff, name="staff-delete"),
+    path('getStaffById/', views.getStaffById, name="staff"),
+    path('updateStaffById/', views.updateStaff, name="staff-update"),
+    path('deleteStaffById/', views.deleteStaff, name="staff-delete"),
 
 ]
