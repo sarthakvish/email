@@ -130,9 +130,11 @@ def updateUser(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['DELETE'])
+@api_view(['POST'])
 @permission_classes([IsAdminUser])
-def deleteUser(request, pk):
+def deleteUser(request):
+    data = request.data
+    pk = data['id']
     userForDeletion = User.objects.get(id=pk)
     userForDeletion.delete()
     return Response('User was deleted')
