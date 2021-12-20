@@ -4,12 +4,16 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+import email_app.models.user_models
 from email_app.serializers import UserSerializerWithToken, CompanyProfileSerializer, UserSerializer
 from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from django.contrib.auth.models import User
 from email_app.models.user_models import CompanyProfile
 from django.contrib.auth.models import Group
+from django.db import IntegrityError
+from django.contrib.auth.models import Permission
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -73,10 +77,12 @@ def registerUser(request):
             email=data['email'],
             password=make_password(data['password'])
         )
-
+        group = Group.objects.get(name='company_admin')
+        print('group', group)
+        user.groups.add(group)
         serializer = UserSerializerWithToken(user, many=False)
         return Response(serializer.data)
-    except:
+    except IntegrityError as e:
         message = {'detail': 'User with this email is already exists'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
@@ -87,6 +93,11 @@ def createCompanyProfile(request):
     user = request.user
     data = request.data
     group_name = Group.objects.get(user=user)
+    # permissions = Permission.objects.get(user=user.id)
+    # print('permission', permissions)
+    # if user.has_perm('email_app.company_profile.can_add_company_profile'):
+    #     print("yes has permission")
+
     try:
         if group_name.name == 'staffuser':
             message = {'detail': 'You are not allowed to create company!'}
@@ -101,7 +112,7 @@ def createCompanyProfile(request):
             )
             serializer = CompanyProfileSerializer(company_profile, many=False)
             return Response(serializer.data)
-    except:
+    except IntegrityError as e:
         message = {'detail': 'Company profile already created!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 

@@ -6,6 +6,7 @@ from email_app.models.subscribers_models import Subscribers
 from email_app.models.user_models import CompanyProfile
 from email_app.serializers import SubscribersSerializer
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 
 @api_view(['POST'])
@@ -39,7 +40,6 @@ def getSubscribers(request):
 
     try:
         company_obj = CompanyProfile.objects.get(user=user)
-        print("hello", company_obj.company_id)
         subscribers = Subscribers.objects.filter(company_id=company_obj.id)
         serializer = SubscribersSerializer(subscribers, many=True)
         return Response(serializer.data)
@@ -48,44 +48,61 @@ def getSubscribers(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def getSubscriberById(request, pk):
+def getSubscriberById(request):
+    user = request.user
+    data = request.data
+    pk = data['id']
+    company_obj = CompanyProfile.objects.get(user=user)
+    if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+        try:
+            subscriber = Subscribers.objects.get(id=pk)
+            serializer = SubscribersSerializer(subscriber, many=False)
+            return Response(serializer.data)
+        except:
+            message = {'detail': 'User does not exist'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    return Response("you are not allowed to view this subscriber detail")
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def updateSubscriber(request):
     user = request.user
     company_obj = CompanyProfile.objects.get(user=user)
-    try:
-        subscriber = Subscribers.objects.get(id=pk)
-        serializer = SubscribersSerializer(subscriber, many=False)
-        return Response(serializer.data)
-    except:
-        message = {'detail': 'User does not exist'}
-        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    data = request.data
+    pk = data['id']
+    if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+        try:
+            subscriber = Subscribers.objects.get(id=pk)
+            data = request.data
+            subscriber.name = data['name']
+            subscriber.email = data['email']
+            subscriber.phone = data['phone']
+
+            subscriber.save()
+
+            serializer = SubscribersSerializer(subscriber, many=False)
+
+            return Response(serializer.data)
+
+        except:
+            message = {'detail': 'Please verify the details!'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    return Response('You do not have permission to update this subscriber record')
 
 
-@api_view(['PUT'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def updateSubscriber(request, pk):
-    try:
-        subscriber = Subscribers.objects.get(id=pk)
-        data = request.data
-        subscriber.name = data['name']
-        subscriber.email = data['email']
-        subscriber.phone = data['phone']
+def deleteSubscriber(request):
+    user = request.user
+    company_obj = CompanyProfile.objects.get(user=user)
+    data = request.data
+    pk = data['id']
+    if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+        subscriberForDeletion = Subscribers.objects.get(id=pk)
+        subscriberForDeletion.delete()
+        return Response('Subscriber was deleted')
+    return Response("You do not have permission to delete this subscriber")
 
-        subscriber.save()
-
-        serializer = SubscribersSerializer(subscriber, many=False)
-
-        return Response(serializer.data)
-
-    except:
-        message = {'detail': 'Please verify the details!'}
-        return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def deleteSubscriber(request, pk):
-    subscriberForDeletion = Subscribers.objects.get(id=pk)
-    subscriberForDeletion.delete()
-    return Response('Subscriber was deleted')
