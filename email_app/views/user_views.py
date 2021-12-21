@@ -93,9 +93,11 @@ def createCompanyProfile(request):
     user = request.user
     data = request.data
     group_name = Group.objects.get(user=user)
-    # permissions = Permission.objects.get(user=user.id)
-    # print('permission', permissions)
-    # if user.has_perm('email_app.company_profile.can_add_company_profile'):
+    permissions = Permission.objects.filter(group=group_name)
+
+    # for permission in permissions.iterator():
+    #     print(permission)
+    # if user.has_perm('email_app.can_add_company_profile'):
     #     print("yes has permission")
 
     try:

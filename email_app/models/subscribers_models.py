@@ -26,7 +26,7 @@ class Subscribers(models.Model):
 class List(models.Model):
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
     subscriber = models.ManyToManyField(Subscribers)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     LISTS_CHOICES = (
         ('PRIVATE', 'Private'),
         ('PUBLIC', 'Public'),

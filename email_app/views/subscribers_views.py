@@ -7,30 +7,37 @@ from email_app.models.user_models import CompanyProfile
 from email_app.serializers import SubscribersSerializer
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def createSubscriber(request):
-    user = request.user
-    print('sarthak', user)
-    company_obj = CompanyProfile.objects.get(user=user)
-    data = request.data
-
     try:
-        subscriber = Subscribers.objects.create(
-            company=company_obj,
-            name=data['name'],
-            email=data['email'],
-            phone=data['phone']
-        )
+        user = request.user
+        print('sarthak', user)
+        company_obj = CompanyProfile.objects.get(user=user)
+        data = request.data
 
-        serializer = SubscribersSerializer(subscriber, many=False)
-        return Response(serializer.data)
+        try:
+            subscriber = Subscribers.objects.create(
+                company=company_obj,
+                name=data['name'],
+                email=data['email'],
+                phone=data['phone']
+            )
 
-    except:
-        message = {'detail': 'Staff with this email already exists!'}
-        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+            serializer = SubscribersSerializer(subscriber, many=False)
+            return Response(serializer.data)
+
+        except:
+            message = {'detail': 'Subscriber already exists!'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    except ObjectDoesNotExist:
+        message = {'detail': 'You dont have permission to create subscriber'}
+        return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['GET'])
