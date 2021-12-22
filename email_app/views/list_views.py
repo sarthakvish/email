@@ -64,7 +64,7 @@ def getLists(request):
         lists = List.objects.filter(company_id=company_obj.id)
         serializer = ListSerializer(lists, many=True)
         return Response(serializer.data)
-    except:
+    except ObjectDoesNotExist:
         message = {'detail': 'You do not have permission to view all lists'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
@@ -82,7 +82,7 @@ def getListById(request):
             serializer = ListSerializer(list, many=False)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response('You do not have permission to view this record ')
-    except:
+    except ObjectDoesNotExist:
         message = {'detail': 'You are not authorized to view list'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
@@ -91,37 +91,49 @@ def getListById(request):
 @permission_classes([IsAuthenticated])
 def updateList(request):
     user = request.user
-    company_obj = CompanyProfile.objects.get(user=user)
-    data = request.data
-    pk = data['id']
-    if List.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
-        list_obj = List.objects.get(id=pk)
-        listquery= list_obj.subscriber.all()
-        print(listquery)
-        list1=[listquery for listquery in listquery]
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        data = request.data
+        pk = data['id']
+        if List.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            list_obj = List.objects.get(id=pk)
+            list_obj.name = data['name']
+            list_obj.list_type = data['list_type']
+            list_obj.save()
+            serializer = ListSerializer(list_obj, many=False)
 
-        print(list1)
-        list_obj.name = data['name']
-        # list_obj.list_type = data['list_type']
-        list_obj.save()
-        # tag_names = data['tags']
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response('You do not have permission to update this subscriber record',
+                        status=status.HTTP_406_NOT_ACCEPTABLE)
+    except ObjectDoesNotExist:
+        message = {'detail': 'You are not authorized to update list'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = ListSerializer(list_obj, many=False)
 
-        return Response(serializer.data)
-        # try:
-        #     list_obj = List.objects.get(id=pk)
-        #     print(list_obj.subscriber)
-        #     list_obj.name = data['name']
-        #     list_obj.list_type = data['list_type']
-        #     list_obj.save()
-        #     # tag_names = data['tags']
-        #
-        #     serializer = ListSerializer(list_obj, many=False)
-        #
-        #     return Response(serializer.data)
-        #
-        # except:
-        #     message = {'detail': 'Please verify the details!'}
-        #     return Response(message, status=status.HTTP_400_BAD_REQUEST)
-    return Response('You do not have permission to update this subscriber record')
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def addSubscriberToList(request):
+    user = request.user
+
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        data = request.data
+        pk = data['id']
+        subscriber_list = data['subscriber']
+        if List.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            list_obj = List.objects.get(id=pk)
+            list_obj.subscriber.clear()
+            for subscriber in subscriber_list:
+                subscriber = Subscribers.objects.get(name=subscriber)
+                print('subscriber')
+                list_obj.subscriber.add(subscriber)
+            print(list_obj.subscriber.all())
+
+            return Response("done")
+        return Response('You do not have permission to update this subscriber record',
+                        status=status.HTTP_406_NOT_ACCEPTABLE)
+    except ObjectDoesNotExist:
+        message = {'detail': 'You are not authorized to update list'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+

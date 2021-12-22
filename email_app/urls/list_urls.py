@@ -6,4 +6,5 @@ urlpatterns = [
     path('', views.getLists, name="lists"),
     path('getListById/', views.getListById, name="list"),
     path('updateListById/', views.updateList, name="update_list"),
+    path('addSubscriberToListById/', views.addSubscriberToList, name="add_subscriber_list"),
 ]
