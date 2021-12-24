@@ -100,6 +100,19 @@ def updateList(request):
             list_obj.name = data['name']
             list_obj.list_type = data['list_type']
             list_obj.save()
+            subscriber_list = data['subscriber']
+            list_obj.subscriber.clear()
+            for subscriber in subscriber_list:
+                subscriber = Subscribers.objects.get(name=subscriber)
+                print('subscriber')
+                list_obj.subscriber.add(subscriber)
+            tag_list = data['tags']
+            list_obj.tags.clear()
+            for tag_name in tag_list:
+                tag, created = Tag.objects.get_or_create(name=tag_name)
+                print('tag', tag)
+                list_obj.tags.add(tag)
+                list_obj.save()
             serializer = ListSerializer(list_obj, many=False)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -109,31 +122,21 @@ def updateList(request):
         message = {'detail': 'You are not authorized to update list'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def addSubscriberToList(request):
+def deleteListById(request):
     user = request.user
-
+    data = request.data
+    pk = data['id']
     try:
         company_obj = CompanyProfile.objects.get(user=user)
-        data = request.data
-        pk = data['id']
-        subscriber_list = data['subscriber']
         if List.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
-            list_obj = List.objects.get(id=pk)
-            list_obj.subscriber.clear()
-            for subscriber in subscriber_list:
-                subscriber = Subscribers.objects.get(name=subscriber)
-                print('subscriber')
-                list_obj.subscriber.add(subscriber)
-            print(list_obj.subscriber.all())
-
-            return Response("done")
-        return Response('You do not have permission to update this subscriber record',
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+            list = List.objects.get(id=pk)
+            list.delete()
+            return Response("list has been deleted successfully!", status=status.HTTP_202_ACCEPTED)
+        return Response('You do not have permission to delete this record ')
     except ObjectDoesNotExist:
-        message = {'detail': 'You are not authorized to update list'}
+        message = {'detail': 'You are not authorized to delete list'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 

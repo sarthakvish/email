@@ -64,7 +64,7 @@ class Campaigns(models.Model):
     )
     list = models.ManyToManyField(List)
     messenger = models.CharField(default="EMAIL", choices=MESSENGER_CHOICES, max_length=20)
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
     tags = TaggableManager()

@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin',]
+        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin', ]
 
     def get__id(self, obj):
         return obj.id
@@ -27,7 +27,6 @@ class UserSerializer(serializers.ModelSerializer):
         if name == '':
             name = obj.email
         return name
-
 
 
 class UserSerializerWithToken(UserSerializer):
@@ -107,7 +106,11 @@ class ListSerializer(TaggitSerializer, serializers.ModelSerializer):
         model = List
         fields = '__all__'
 
-    # def get_subscriber(self, obj):
-    #     subscriber = obj.subscriber
-    #     serializer = SubscribersSerializer(subscriber, many=True)
-    #     return serializer.data
+
+class CampaignSerializer(TaggitSerializer, serializers.ModelSerializer):
+    tags = TagListSerializerField()
+    list = ListSerializer(many=True)
+
+    class Meta:
+        model = Campaigns
+        fields = '__all__'
