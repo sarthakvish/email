@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -6,6 +7,8 @@ from email_app.models.subscribers_models import Template
 from email_app.models.user_models import CompanyProfile
 from email_app.serializers import TemplatesSerializer
 from bs4 import BeautifulSoup
+from django.core.exceptions import ObjectDoesNotExist
+
 
 
 @api_view(['GET'])
@@ -22,13 +25,15 @@ def getTemplates(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def getTemplateById(request, pk):
+def getTemplateById(request):
     user = request.user
-    company_obj = CompanyProfile.objects.get(user=user)
+    data = request.data
+    pk = data['id']
 
     try:
+        company_obj = CompanyProfile.objects.get(user=user)
         template = Template.objects.get(id=pk)
         serializer = TemplatesSerializer(template, many=False)
         return Response(serializer.data)
@@ -36,20 +41,24 @@ def getTemplateById(request, pk):
         message = {'detail': 'Template does not exist'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def getTemplateSourceCode(request, pk):
+def getTemplateSourceCode(request):
     user = request.user
-    company_obj = CompanyProfile.objects.get(user=user)
+    data = request.data
+    pk = data['id']
     try:
-        template = Template.objects.get(id=pk)
-        serializer = TemplatesSerializer(template, many=False)
-        print(template.template)
-        file = open(f"media/{template.template}", 'r', encoding='utf-8')
-        source_code = file.read()
-        S = BeautifulSoup(source_code, 'html.parser')
-        print(source_code)
-        return Response(S.prettify())
-    except:
+        company_obj = CompanyProfile.objects.get(user=user)
+        if Template.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            template = Template.objects.get(id=pk)
+            serializer = TemplatesSerializer(template, many=False)
+            print(template.template)
+            file = open(f"templates/{template.template}", 'r', encoding='utf-8')
+            source_code = file.read()
+            S = BeautifulSoup(source_code, 'html.parser')
+            print(source_code)
+            return Response(S.prettify())
+        return Response("You do not have permission to view this template source!")
+    except ObjectDoesNotExist:
         message = {'detail': 'Template does not exist'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)

@@ -48,31 +48,31 @@ def createStaffProfile(request):
         print('group', group)
         user.groups.add(group)
 
-        # current_site = get_current_site(request)
-        # email_body = {
-        #     'user': user,
-        #     'domain': current_site.domain,
-        #     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        #     'token': account_activation_token.make_token(user),
-        # }
-        #
-        # link = reverse('activate', kwargs={
-        #     'uidb64': email_body['uid'], 'token': email_body['token']})
-        #
-        # email_subject = 'Activate your account'
-        #
-        # activate_url = 'http://' + current_site.domain + link
-        # html = render_to_string("register.html", {"activate_url": activate_url, "user": user.first_name})
-        #
-        # email_message = EmailMultiAlternatives(
-        #     email_subject,
-        #     'Hi ' + user.first_name + ', Please the link below to activate your account \n' + activate_url,
-        #     settings.EMAIL_HOST_USER,
-        #     ['sarthakvishwakarma6@gmail.com'],
-        #
-        # )
-        # email_message.attach_alternative(html, "text/html")
-        # EmailThread(email_message).start()
+        current_site = get_current_site(request)
+        email_body = {
+            'user': user,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': account_activation_token.make_token(user),
+        }
+
+        link = reverse('activate', kwargs={
+            'uidb64': email_body['uid'], 'token': email_body['token']})
+
+        email_subject = 'Activate your account'
+
+        activate_url = 'http://' + current_site.domain + link
+        html = render_to_string("email/hyber_dashboard.html", {"activate_url": activate_url, "user": user.first_name})
+
+        email_message = EmailMultiAlternatives(
+            email_subject,
+            'Hi ' + user.first_name + ', Please the link below to activate your account \n' + activate_url,
+            settings.EMAIL_HOST_USER,
+            ['sarthakvishwakarma6@gmail.com'],
+
+        )
+        email_message.attach_alternative(html, "text/html")
+        EmailThread(email_message).start()
 
         serializer = StaffSerializerWithUser(staff_profile, many=False)
         return Response(serializer.data)

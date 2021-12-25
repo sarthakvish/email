@@ -45,7 +45,7 @@ class Template(models.Model):
     name = models.CharField(max_length=100)
     body = RichTextUploadingField()
     discription = models.TextField(default="hello")
-    template = models.FileField(upload_to="templates/email")
+    template = models.FileField(upload_to="email")
     is_default = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)

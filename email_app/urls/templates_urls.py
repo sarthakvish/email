@@ -3,6 +3,6 @@ from email_app.views import templates_views as views
 
 urlpatterns = [
     path('', views.getTemplates, name="templates"),
-    path('<str:pk>/', views.getTemplateById, name="template"),
-    path('source/<str:pk>/', views.getTemplateSourceCode, name="source"),
+    path('getTemplateById/', views.getTemplateById, name="template"),
+    path('getTemplateSourceCode/', views.getTemplateSourceCode, name="source"),
 ]
