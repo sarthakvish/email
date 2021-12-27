@@ -5,4 +5,5 @@ urlpatterns = [
     path('', views.getTemplates, name="templates"),
     path('getTemplateById/', views.getTemplateById, name="template"),
     path('getTemplateSourceCode/', views.getTemplateSourceCode, name="source"),
+    path('deleteTemplateById/', views.deleteTemplateById, name="delete-template"),
 ]

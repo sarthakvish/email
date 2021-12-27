@@ -114,3 +114,11 @@ class CampaignSerializer(TaggitSerializer, serializers.ModelSerializer):
     class Meta:
         model = Campaigns
         fields = '__all__'
+
+
+class CampaignSerializerWithoutList(TaggitSerializer, serializers.ModelSerializer):
+    tags = TagListSerializerField()
+
+    class Meta:
+        model = Campaigns
+        fields = '__all__'

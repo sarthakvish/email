@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from email_app.models.subscribers_models import List, Subscribers, Campaigns
 from email_app.models.user_models import CompanyProfile
 from taggit.models import Tag
-from email_app.serializers import CampaignSerializer
+from email_app.serializers import CampaignSerializer, CampaignSerializerWithoutList
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 
@@ -65,7 +65,8 @@ def getCampaigns(request):
         company_obj = CompanyProfile.objects.get(user=user)
         print("hello", company_obj.company_id)
         campaigns = Campaigns.objects.filter(company_id=company_obj.id)
-        serializer = CampaignSerializer(campaigns, many=True)
+        print(campaigns)
+        serializer = CampaignSerializerWithoutList(campaigns, many=True)
         return Response(serializer.data)
     except ObjectDoesNotExist:
         message = {'detail': 'You do not have permission to view all campaign'}

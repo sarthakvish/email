@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 from django.core.exceptions import ObjectDoesNotExist
 
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getTemplates(request):
@@ -41,6 +40,7 @@ def getTemplateById(request):
         message = {'detail': 'Template does not exist'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def getTemplateSourceCode(request):
@@ -61,4 +61,22 @@ def getTemplateSourceCode(request):
         return Response("You do not have permission to view this template source!")
     except ObjectDoesNotExist:
         message = {'detail': 'Template does not exist'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def deleteTemplateById(request):
+    user = request.user
+    data = request.data
+    pk = data['id']
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        if Template.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            template = Template.objects.get(id=pk)
+            template.delete()
+            return Response("Template has been deleted successfully!", status=status.HTTP_202_ACCEPTED)
+        return Response('You do not have permission to delete this record ')
+    except ObjectDoesNotExist:
+        message = {'detail': 'You are not authorized to delete Template'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
