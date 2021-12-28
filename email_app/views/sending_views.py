@@ -49,10 +49,10 @@ def get_template_to_send(user, email_subject, text_content, from_email, to, temp
     html = render_to_string(template_path, {"user": ctx})
 
     email_message = EmailMultiAlternatives(
-        email_subject,
-        text_content,
-        from_email,
-        to,
+        subject=email_subject,
+        body=text_content,
+        from_email=from_email,
+        bcc=to,
     )
     email_message.attach_alternative(html, "text/html")
     EmailThread(email_message).start()
