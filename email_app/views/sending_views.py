@@ -30,12 +30,19 @@ def getCampaignsSubscriber(request):
             for list_obj in campaign_lists:
                 subscribers = list_obj.subscriber.all()
                 for subcriber in subscribers:
-                    mail_sending_list.append(subcriber.email)
-            unique_send_list = list(set(mail_sending_list))
-            print(unique_send_list)
+                    mail_sending_list.append({"email": subcriber.email,
+                                              "name": subcriber.name})
+            # unique_send_list = list(set(mail_sending_list))
+            unique_send_list = list({v['email']: v for v in mail_sending_list}.values())
             get_template_to_send(request.user, "hi all", "",
                                  settings.DEFAULT_FROM_EMAIL,
-                                 unique_send_list, "email/hyber_dashboard.html", {"user": request.user})
+                                 unique_send_list, "email/hyber_dashboard.html",
+                                 {"user": request.user,
+                                  "attendance": [{"name": "kanchan",
+                                                  "att": 30},
+                                                 {"name": "sarthak",
+                                                  "att": 20}
+                                                 ]})
             return Response(unique_send_list, status=status.HTTP_200_OK)
         return Response('You do not have permission to view this record ')
     except ObjectDoesNotExist:
@@ -46,14 +53,25 @@ def getCampaignsSubscriber(request):
 # Function to make email message dynamically
 
 def get_template_to_send(user, email_subject, text_content, from_email, to, template_path, ctx):
-    html = render_to_string(template_path, {"user": ctx})
+    print(to)
+    for obj in to:
+        print(obj)
+        html = render_to_string(template_path, {"name": obj['name']})
 
-    email_message = EmailMultiAlternatives(
-        subject=email_subject,
-        body=text_content,
-        from_email=from_email,
-        bcc=to,
-    )
-    email_message.attach_alternative(html, "text/html")
-    EmailThread(email_message).start()
-    return email_message
+        email_message = EmailMultiAlternatives(
+            subject=email_subject,
+            body=text_content,
+            from_email=from_email,
+            to=[obj['email']],
+        )
+        email_message.attach_alternative(html, "text/html")
+        EmailThread(email_message).start()
+    return
+
+
+def fetch_subscriber_data_by_api_wwe360(request):
+    pass
+
+
+def get_subscriber_context_data(request):
+    pass
