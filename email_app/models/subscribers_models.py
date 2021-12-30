@@ -15,6 +15,7 @@ class Subscribers(models.Model):
         ('ENABLED', 'Enabled'),
         ('BLACKLISTED', 'Blacklisted'),
     )
+    is_active = models.BooleanField(default=True)
     subscriber_status = models.CharField(default="ENABLED", choices=SUBSCRIBERS_CHOICES, max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
@@ -32,6 +33,7 @@ class List(models.Model):
         ('PUBLIC', 'Public'),
     )
     list_type = models.CharField(default="PUBLIC", choices=LISTS_CHOICES, max_length=20)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
     tags = TaggableManager()
@@ -47,6 +49,7 @@ class Template(models.Model):
     discription = models.TextField(default="hello")
     template = models.FileField(upload_to="email")
     is_default = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
 
@@ -65,6 +68,7 @@ class Campaigns(models.Model):
     list = models.ManyToManyField(List)
     messenger = models.CharField(default="EMAIL", choices=MESSENGER_CHOICES, max_length=20)
     template = models.ForeignKey(Template, on_delete=models.CASCADE, null=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
     tags = TaggableManager()

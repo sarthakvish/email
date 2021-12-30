@@ -39,7 +39,6 @@ def createSubscriber(request):
         return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getSubscribers(request):
@@ -47,7 +46,7 @@ def getSubscribers(request):
 
     try:
         company_obj = CompanyProfile.objects.get(user=user)
-        subscribers = Subscribers.objects.filter(company_id=company_obj.id)
+        subscribers = Subscribers.objects.filter(Q(company_id=company_obj.id) & Q(is_active=True))
         serializer = SubscribersSerializer(subscribers, many=True)
         return Response(serializer.data)
     except:
@@ -64,7 +63,9 @@ def getSubscriberById(request):
     company_obj = CompanyProfile.objects.get(user=user)
     if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
         try:
+            # subscriber = Subscribers.objects.filter(Q(id=pk) & Q(is_active=True))
             subscriber = Subscribers.objects.get(id=pk)
+            # serializer = SubscribersSerializer(subscriber, many=True)
             serializer = SubscribersSerializer(subscriber, many=False)
             return Response(serializer.data)
         except:
@@ -112,4 +113,3 @@ def deleteSubscriber(request):
         subscriberForDeletion.delete()
         return Response('Subscriber was deleted')
     return Response("You do not have permission to delete this subscriber")
-
