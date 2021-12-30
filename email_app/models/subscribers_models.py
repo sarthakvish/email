@@ -7,6 +7,8 @@ from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class Subscribers(models.Model):
+    class Meta:
+        unique_together = (('company', 'email'),)
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=255)

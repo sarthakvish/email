@@ -14,12 +14,11 @@ from django.db import IntegrityError
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def createSubscriber(request):
+    user = request.user
+    print('sarthak', user)
     try:
-        user = request.user
-        print('sarthak', user)
         company_obj = CompanyProfile.objects.get(user=user)
         data = request.data
-
         try:
             subscriber = Subscribers.objects.create(
                 company=company_obj,
@@ -43,14 +42,18 @@ def createSubscriber(request):
 @permission_classes([IsAuthenticated])
 def getSubscribers(request):
     user = request.user
-
     try:
         company_obj = CompanyProfile.objects.get(user=user)
         subscribers = Subscribers.objects.filter(Q(company_id=company_obj.id) & Q(is_active=True))
+        # subscribers_count = Subscribers.objects.filter(Q(company_id=company_obj.id) & Q(is_active=True)).count()
         serializer = SubscribersSerializer(subscribers, many=True)
+        # context = {
+        #     'data': serializer.data,
+        #     'count': subscribers_count
+        # }
         return Response(serializer.data)
     except:
-        message = {'detail': 'Something went wrong'}
+        message = {'detail': 'You are not authorized!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -60,56 +63,68 @@ def getSubscriberById(request):
     user = request.user
     data = request.data
     pk = data['id']
-    company_obj = CompanyProfile.objects.get(user=user)
-    if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
-        try:
-            # subscriber = Subscribers.objects.filter(Q(id=pk) & Q(is_active=True))
-            subscriber = Subscribers.objects.get(id=pk)
-            # serializer = SubscribersSerializer(subscriber, many=True)
-            serializer = SubscribersSerializer(subscriber, many=False)
-            return Response(serializer.data)
-        except:
-            message = {'detail': 'User does not exist'}
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-    return Response("you are not allowed to view this subscriber detail")
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            try:
+                # subscriber = Subscribers.objects.filter(Q(id=pk) & Q(is_active=True))
+                subscriber = Subscribers.objects.get(id=pk)
+                # serializer = SubscribersSerializer(subscriber, many=True)
+                serializer = SubscribersSerializer(subscriber, many=False)
+                return Response(serializer.data)
+            except:
+                message = {'detail': 'User does not exist'}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        return Response("you are not allowed to view this subscriber detail")
+    except:
+        message = {'detail': 'You are not authorized!'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def updateSubscriber(request):
     user = request.user
-    company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
     pk = data['id']
-    if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
-        try:
-            subscriber = Subscribers.objects.get(id=pk)
-            data = request.data
-            subscriber.name = data['name']
-            subscriber.email = data['email']
-            subscriber.phone = data['phone']
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            try:
+                subscriber = Subscribers.objects.get(id=pk)
+                data = request.data
+                subscriber.name = data['name']
+                subscriber.email = data['email']
+                subscriber.phone = data['phone']
 
-            subscriber.save()
+                subscriber.save()
 
-            serializer = SubscribersSerializer(subscriber, many=False)
+                serializer = SubscribersSerializer(subscriber, many=False)
 
-            return Response(serializer.data)
+                return Response(serializer.data)
 
-        except:
-            message = {'detail': 'Please verify the details!'}
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-    return Response('You do not have permission to update this subscriber record')
+            except:
+                message = {'detail': 'Please verify the details!'}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        return Response('You do not have permission to update this subscriber record')
+    except:
+        message = {'detail': 'You are not authorized!'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def deleteSubscriber(request):
     user = request.user
-    company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
     pk = data['id']
-    if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
-        subscriberForDeletion = Subscribers.objects.get(id=pk)
-        subscriberForDeletion.delete()
-        return Response('Subscriber was deleted')
-    return Response("You do not have permission to delete this subscriber")
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        if Subscribers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            subscriberForDeletion = Subscribers.objects.get(id=pk)
+            subscriberForDeletion.delete()
+            return Response('Subscriber was deleted')
+        return Response("You do not have permission to delete this subscriber")
+    except:
+        message = {'detail': 'You are not authorized!'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)

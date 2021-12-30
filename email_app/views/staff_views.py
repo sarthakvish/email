@@ -20,17 +20,17 @@ import uuid
 from django.template.loader import render_to_string
 from django.contrib.auth.models import Group
 from django.db.models import Q
-
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def createStaffProfile(request):
     user = request.user
     print('sarthak', user)
-    company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
-
     try:
+        company_obj = CompanyProfile.objects.get(user=user)
         user = User.objects.create(
             first_name=data['name'],
             username=data['unverified_staff_email'],
@@ -62,7 +62,7 @@ def createStaffProfile(request):
         email_subject = 'Activate your account'
 
         activate_url = 'http://' + current_site.domain + link
-        html = render_to_string("email/hyber_dashboard.html", {"activate_url": activate_url, "user": user.first_name})
+        html = render_to_string("email/register.html", {"activate_url": activate_url, "user": user.first_name})
 
         email_message = EmailMultiAlternatives(
             email_subject,
@@ -77,10 +77,12 @@ def createStaffProfile(request):
         serializer = StaffSerializerWithUser(staff_profile, many=False)
         return Response(serializer.data)
 
-    except:
+    except IntegrityError:
         message = {'detail': 'Staff with this email already exists!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
+    except ObjectDoesNotExist:
+        message = {'detail': 'You are not authorized!'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def verificationView(request, uidb64, token):
@@ -129,7 +131,7 @@ def getStaff(request):
         serializer = StaffSerializerWithUser(staff, many=True)
         return Response(serializer.data)
     except:
-        message = {'detail': 'Something went wrong'}
+        message = {'detail': 'You are not authorized!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -137,16 +139,22 @@ def getStaff(request):
 @permission_classes([IsAuthenticated])
 def getStaffById(request):
     user = request.user
-    company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
     pk = data['id']
-    # staff = StaffUsers.objects.get(id=pk)
     try:
-        staff = StaffUsers.objects.filter(Q(id=pk) & Q(company=company_obj))
-        serializer = StaffSerializerWithUser(staff, many=True)
-        return Response(serializer.data)
-    except:
-        message = {'detail': 'User does not exist'}
+        company_obj = CompanyProfile.objects.get(user=user)
+        if StaffUsers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            try:
+                staff = StaffUsers.objects.get(id=pk)
+                serializer = StaffSerializerWithUser(staff, many=False)
+                return Response(serializer.data)
+            except:
+                message = {'detail': 'staff does not exist'}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        return Response("you are not allowed to view this staff detail")
+
+    except ObjectDoesNotExist:
+        message = {'detail': 'You are not authorized!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -154,30 +162,32 @@ def getStaffById(request):
 @permission_classes([IsAuthenticated])
 def updateStaff(request):
     user = request.user
-    company_obj = CompanyProfile.objects.get(user=user)
     data = request.data
     pk = data['id']
-
     try:
+        company_obj = CompanyProfile.objects.get(user=user)
         if StaffUsers.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
-            staff = StaffUsers.objects.get(id=pk)
-            data = request.data
-            print('data', data)
-            print(staff.user.last_name)
-            staff.user.first_name = data['first_name']
-            staff.user.last_name = data['last_name']
-            staff.user.save()
-            staff.role_status = data['role_status']
-            staff.save()
+            try:
+                staff = StaffUsers.objects.get(id=pk)
+                data = request.data
+                print('data', data)
+                print(staff.user.last_name)
+                staff.user.first_name = data['first_name']
+                staff.user.last_name = data['last_name']
+                staff.user.save()
+                staff.role_status = data['role_status']
+                staff.save()
 
-            serializer = StaffSerializerWithUser(staff, many=False)
+                serializer = StaffSerializerWithUser(staff, many=False)
 
-            return Response(serializer.data)
+                return Response(serializer.data)
+            except:
+                message = {'detail': 'Please verify the details!'}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
         return Response('You do not have permission to update this record ')
-
-
     except:
-        message = {'detail': 'Please verify the details!'}
+        message = {'detail': 'You are not authorized!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
