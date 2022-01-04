@@ -5,13 +5,9 @@ from django.conf.urls.static import static
 from email_project import settings
 from django_ses.views import SESEventWebhookView
 from django.views.decorators.csrf import csrf_exempt
-from adminplus.sites import AdminSitePlus
 
-admin.site = AdminSitePlus()
-admin.autodiscover()
 
 urlpatterns = [
-                  path('admin/django-ses/', include('django_ses.urls')),
                   path('admin/', admin.site.urls),
                   path('api/users/', include('email_app.urls.user_urls')),
                   path('api/staff/', include('email_app.urls.staff_urls')),
