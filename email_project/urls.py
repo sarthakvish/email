@@ -2,10 +2,16 @@ import debug_toolbar
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-
 from email_project import settings
+from django_ses.views import SESEventWebhookView
+from django.views.decorators.csrf import csrf_exempt
+from adminplus.sites import AdminSitePlus
+
+admin.site = AdminSitePlus()
+admin.autodiscover()
 
 urlpatterns = [
+                  path('admin/django-ses/', include('django_ses.urls')),
                   path('admin/', admin.site.urls),
                   path('api/users/', include('email_app.urls.user_urls')),
                   path('api/staff/', include('email_app.urls.staff_urls')),
@@ -16,4 +22,6 @@ urlpatterns = [
                   path('api/send/', include('email_app.urls.sending_urls')),
                   path('__debug__/', include(debug_toolbar.urls)),
                   path('ckeditor/', include('ckeditor_uploader.urls')),
+                  path('ses/event-webhook/', SESEventWebhookView.as_view(), name='handle-event-webhook'),
+
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
