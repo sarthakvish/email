@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'email_app',
     'ckeditor',
     'ckeditor_uploader',
@@ -84,6 +85,7 @@ SIMPLE_JWT = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -230,3 +232,5 @@ AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
 AWS_SES_REGION_NAME = env('AWS_SES_REGION_NAME')
 AWS_SES_REGION_ENDPOINT = env('AWS_SES_REGION_ENDPOINT')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+
+CORS_ALLOW_ALL_ORIGINS = True
