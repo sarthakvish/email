@@ -9,6 +9,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 class Subscribers(models.Model):
     class Meta:
         unique_together = (('company', 'email'),)
+
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=255)
@@ -77,3 +78,16 @@ class Campaigns(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class SubscriberEmailData(models.Model):
+    subscriber = models.ForeignKey(Subscribers, on_delete=models.CASCADE)
+    date = models.DateField()
+
+
+class GetList(models.Model):
+    title = models.CharField(max_length=100)
+    body = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title

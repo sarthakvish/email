@@ -7,3 +7,8 @@ class MailtemplateConfig(AppConfig):
 
     def ready(self):
         import email_app.signals
+        print("Starting Scheduler ...")
+        from email_app import update_subscriber_email_data
+        update_subscriber_email_data.start()
+
+

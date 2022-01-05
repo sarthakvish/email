@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from email_app.models.user_models import CompanyProfile, StaffUsers
-from email_app.models.subscribers_models import Subscribers, Template, List, Campaigns
+from email_app.models.subscribers_models import Subscribers, Template, List, Campaigns, GetList
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
 
@@ -122,3 +122,9 @@ class CampaignSerializerWithoutList(TaggitSerializer, serializers.ModelSerialize
     class Meta:
         model = Campaigns
         fields = '__all__'
+
+
+class GetListSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = GetList
+        fields = ('title', 'body')

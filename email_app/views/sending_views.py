@@ -1,3 +1,4 @@
+import json
 from django.db.models import Q
 from django.template.loader import render_to_string
 from rest_framework import status
@@ -6,12 +7,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from email_app.models.subscribers_models import Campaigns
 from email_app.models.user_models import CompanyProfile
-from email_app.serializers import TemplatesSerializer
-from bs4 import BeautifulSoup
+from email_app.models.subscribers_models import GetList
+from email_app.serializers import TemplatesSerializer, GetListSerializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from email_app.thread_tasks import EmailThread
+import requests
 
 
 @api_view(['GET'])
@@ -69,8 +71,21 @@ def get_template_to_send(user, email_subject, text_content, from_email, to, temp
     return
 
 
-def fetch_subscriber_data_by_api_wwe360(request):
-    pass
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+def fetch_subscriber_data_by_api_wwe360():
+    response = requests.get('https://jsonplaceholder.typicode.com/posts')
+    data = json.loads(response.text)
+    print(data)
+    GetList.objects.all().delete()
+    for item in data:
+        title = item['title']
+        body = item['body']
+        get_list_instance = GetList.objects.create(title=title, body=body)
+        get_list_instance.save()
+        serializer = GetListSerializers(get_list_instance, many=False)
+    print('fetched data successfully')
+    return Response("done")
 
 
 def get_subscriber_context_data(request):
