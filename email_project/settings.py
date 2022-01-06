@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'debug_toolbar',
     'taggit',
+    'django_extensions',
 ]
 
 REST_FRAMEWORK = {
@@ -234,3 +235,4 @@ AWS_SES_REGION_ENDPOINT = env('AWS_SES_REGION_ENDPOINT')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
 CORS_ALLOW_ALL_ORIGINS = True
+DJANGO_ALLOW_AYNSC_UNSAFE=True
