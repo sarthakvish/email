@@ -42,12 +42,12 @@ class UserSerializerWithToken(UserSerializer):
 
 
 class CompanyProfileSerializer(serializers.ModelSerializer):
-
     user = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CompanyProfile
-        fields = ['id', 'company_id', 'company_name', 'address', 'user', 'phone', 'company_website', 'contact_email', 'company_overview']
+        fields = ['id', 'company_id', 'company_name', 'address', 'user', 'phone', 'company_website', 'contact_email',
+                  'company_overview']
 
     def get_user(self, obj):
         user = obj.user
@@ -108,9 +108,10 @@ class ListSerializer(TaggitSerializer, serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CampaignSerializer(TaggitSerializer, serializers.ModelSerializer):
+class CampaignSerializer(TaggitSerializer,TemplatesSerializer, serializers.ModelSerializer):
     tags = TagListSerializerField()
     list = ListSerializer(many=True)
+    template = TemplatesSerializer()
 
     class Meta:
         model = Campaigns

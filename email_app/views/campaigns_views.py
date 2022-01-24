@@ -66,7 +66,7 @@ def getCampaigns(request):
         print("hello", company_obj.company_id)
         campaigns = Campaigns.objects.filter(company_id=company_obj.id)
         print(campaigns)
-        serializer = CampaignSerializerWithoutList(campaigns, many=True)
+        serializer = CampaignSerializer(campaigns, many=True)
         return Response(serializer.data)
     except ObjectDoesNotExist:
         message = {'detail': 'You do not have permission to view all campaign'}
