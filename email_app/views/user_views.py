@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -14,6 +15,7 @@ from email_app.models.user_models import CompanyProfile
 from django.contrib.auth.models import Group
 from django.db import IntegrityError
 from django.contrib.auth.models import Permission
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -119,6 +121,47 @@ def createCompanyProfile(request):
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getCompanyProfile(request):
+    user = request.user
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        serializer = CompanyProfileSerializer(company_obj, many=False)
+        return Response(serializer.data)
+    except ObjectDoesNotExist:
+        message = {'detail': 'You are not a company admin!'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def updateCompanyProfile(request):
+    user = request.user
+    data = request.data
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        try:
+            company_obj.company_name = data['company_name']
+            company_obj.address = data['address']
+            company_obj.company_website = data['company_website']
+            company_obj.phone = data['phone']
+            company_obj.contact_email = data['contact_email']
+            company_obj.company_overview = data['company_overview']
+
+            company_obj.save()
+
+            serializer = CompanyProfileSerializer(company_obj, many=False)
+
+            return Response(serializer.data)
+
+        except:
+            message = {'detail': 'Please verify the details!'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    except ObjectDoesNotExist:
+        message = {'detail': 'You are not authorized!'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def updateUser(request):
@@ -151,4 +194,3 @@ def deleteUser(request):
     userForDeletion = User.objects.get(id=pk)
     userForDeletion.delete()
     return Response('User was deleted')
-
