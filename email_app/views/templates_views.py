@@ -57,7 +57,11 @@ def getTemplateSourceCode(request):
             source_code = file.read()
             S = BeautifulSoup(source_code, 'html.parser')
             print(source_code)
-            return Response(S.prettify())
+            context = {
+                'data': serializer.data,
+                'source': S.prettify(),
+            }
+            return Response(context)
         return Response("You do not have permission to view this template source!")
     except ObjectDoesNotExist:
         message = {'detail': 'Template does not exist'}
