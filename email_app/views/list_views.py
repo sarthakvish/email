@@ -38,7 +38,7 @@ def createList(request):
                 list_instance.save()
             subscriber_list = data['subscriber']
             for subscriber in subscriber_list:
-                subscriber = Subscribers.objects.get(name=subscriber)
+                subscriber = Subscribers.objects.get(name=subscriber, company=company_obj)
                 print('subscriber')
                 list_instance.subscriber.add(subscriber)
             serializer = ListSerializer(list_instance)
@@ -47,7 +47,7 @@ def createList(request):
             message = {'detail': 'Entered Subscriber does not exists but list has been created without subscribers '}
             return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
         except IntegrityError as e:
-            message = {'detail': 'list already created!'}
+            message = {'detail': 'list already created, please select another name for new list!'}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
     except ObjectDoesNotExist:
         message = {'detail': 'You dont have permission to create list'}
