@@ -103,7 +103,7 @@ def updateList(request):
             subscriber_list = data['subscriber']
             list_obj.subscriber.clear()
             for subscriber in subscriber_list:
-                subscriber = Subscribers.objects.get(name=subscriber)
+                subscriber = Subscribers.objects.get(name=subscriber, company=company_obj)
                 print('subscriber')
                 list_obj.subscriber.add(subscriber)
             tag_list = data['tags']
@@ -116,7 +116,7 @@ def updateList(request):
             serializer = ListSerializer(list_obj, many=False)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response('You do not have permission to update this subscriber record',
+        return Response('You do not have permission to update this list record',
                         status=status.HTTP_406_NOT_ACCEPTABLE)
     except ObjectDoesNotExist:
         message = {'detail': 'You are not authorized to update list'}
