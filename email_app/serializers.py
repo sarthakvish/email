@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from rest_framework_simplejwt.tokens import RefreshToken
 from email_app.models.user_models import CompanyProfile, StaffUsers
 from email_app.models.subscribers_models import Subscribers, Template, List, Campaigns, GetList
@@ -7,14 +7,21 @@ from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
 
 
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['name']
+
+
 class UserSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
     _id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
+    groups = GroupSerializer(many=True)
 
     class Meta:
         model = User
-        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin', ]
+        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin', 'groups']
 
     def get__id(self, obj):
         return obj.id
@@ -28,13 +35,19 @@ class UserSerializer(serializers.ModelSerializer):
             name = obj.email
         return name
 
+    def get_name(self, obj):
+        name = obj.first_name
+        if name == '':
+            name = obj.email
+        return name
+
 
 class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin', 'token']
+        fields = ['id', '_id', 'username', 'email', 'name', 'isAdmin', 'groups', 'token', ]
 
     def get_token(self, obj):
         token = RefreshToken.for_user(obj)
@@ -108,7 +121,7 @@ class ListSerializer(TaggitSerializer, serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CampaignSerializer(TaggitSerializer,TemplatesSerializer, serializers.ModelSerializer):
+class CampaignSerializer(TaggitSerializer, TemplatesSerializer, serializers.ModelSerializer):
     tags = TagListSerializerField()
     list = ListSerializer(many=True)
     template = TemplatesSerializer()
