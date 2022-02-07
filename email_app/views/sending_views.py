@@ -46,9 +46,9 @@ def getCampaignsSubscriber(request):
                                                   "att": 20}
                                                  ]})
             return Response(unique_send_list, status=status.HTTP_200_OK)
-        return Response('You do not have permission to view this record ')
+        return Response('You do not have sufficient permission!')
     except ObjectDoesNotExist:
-        message = {'detail': 'You are not authorized to view campaign'}
+        message = {'detail': 'You are not authorized to view campaign!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
