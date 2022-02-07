@@ -63,9 +63,7 @@ def getCampaigns(request):
     user = request.user
     try:
         company_obj = CompanyProfile.objects.get(user=user)
-        print("hello", company_obj.company_id)
         campaigns = Campaigns.objects.filter(company_id=company_obj.id)
-        print(campaigns)
         serializer = CampaignSerializer(campaigns, many=True)
         return Response(serializer.data)
     except ObjectDoesNotExist:

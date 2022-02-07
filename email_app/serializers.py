@@ -121,10 +121,22 @@ class ListSerializer(TaggitSerializer, serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CampaignSerializer(TaggitSerializer, TemplatesSerializer, serializers.ModelSerializer):
+class ListSerializerWithoutSubscriber(TaggitSerializer, serializers.ModelSerializer):
+    class Meta:
+        model = List
+        fields = ['name']
+
+
+class TemplatesSerializerOnlyName(serializers.ModelSerializer):
+    class Meta:
+        model = Template
+        fields = ['name']
+
+
+class CampaignSerializer(TaggitSerializer, TemplatesSerializerOnlyName, serializers.ModelSerializer):
     tags = TagListSerializerField()
-    list = ListSerializer(many=True)
-    template = TemplatesSerializer()
+    list = ListSerializerWithoutSubscriber(many=True)
+    template = TemplatesSerializerOnlyName()
 
     class Meta:
         model = Campaigns
