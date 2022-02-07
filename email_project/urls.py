@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from email_project import settings
 from django_ses.views import SESEventWebhookView
 from django.views.decorators.csrf import csrf_exempt
-
+from email_app import update_subscriber_email_data
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
@@ -21,3 +21,6 @@ urlpatterns = [
                   path('ses/event-webhook/', SESEventWebhookView.as_view(), name='handle-event-webhook'),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+print("Starting Scheduler ...")
+update_subscriber_email_data.start()
