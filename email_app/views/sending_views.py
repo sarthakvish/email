@@ -16,7 +16,7 @@ from email_app.thread_tasks import EmailThread
 import requests
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def getCampaignsSubscriber(request):
     user = request.user
