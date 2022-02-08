@@ -1,4 +1,6 @@
 import json
+import time
+
 from django.db.models import Q
 from django.template.loader import render_to_string
 from rest_framework import status
@@ -12,8 +14,9 @@ from email_app.serializers import TemplatesSerializer, GetListSerializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.mail import EmailMessage, EmailMultiAlternatives
-from email_app.thread_tasks import EmailThread
+from email_app.thread_tasks import EmailThread, send_mail_thread
 import requests
+import threading
 
 
 @api_view(['POST'])
@@ -45,6 +48,9 @@ def getCampaignsSubscriber(request):
                                                  {"name": "sarthak",
                                                   "att": 20}
                                                  ]})
+            # # time.sleep(5)
+            # thread_list=threading.enumerate()
+            # print('thread list', thread_list)
             return Response(unique_send_list, status=status.HTTP_200_OK)
         return Response('You do not have sufficient permission!')
     except ObjectDoesNotExist:
@@ -56,6 +62,8 @@ def getCampaignsSubscriber(request):
 
 def get_template_to_send(user, email_subject, text_content, from_email, to, template_path, ctx):
     print(to)
+    threads = []
+
     for obj in to:
         print(obj)
         html = render_to_string(template_path, {"name": obj['name']})
@@ -68,6 +76,15 @@ def get_template_to_send(user, email_subject, text_content, from_email, to, temp
         )
         email_message.attach_alternative(html, "text/html")
         EmailThread(email_message).start()
+
+        # t1 = threading.Thread(target=send_mail_thread(email_message))
+        # t1.start()
+        # threads.append(t1)
+        # print("main thread")
+    # for thread in threads:
+    #     thread.join()
+    #     print('hello', thread.is_alive())
+    # time.sleep(5)
     return
 
 
