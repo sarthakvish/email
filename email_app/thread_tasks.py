@@ -1,16 +1,16 @@
 import threading
 import time
-
 from smtplib import SMTPException
-
 from django.core.mail import EmailMessage, BadHeaderError
+from email_app.models.subscribers_models import CampaignsLogSubscriber
 
 
 class EmailThread(threading.Thread):
-    def __init__(self, email_message, *args, **kwargs):
+    def __init__(self, email_message, campaign, *args, **kwargs):
         super(EmailThread, self).__init__(*args, **kwargs)
         self._stop_event = threading.Event()
         self.email_message = email_message
+        self.campaign = campaign
         threading.Thread.__init__(self)
 
     def run(self):
@@ -19,6 +19,9 @@ class EmailThread(threading.Thread):
         print(threading.currentThread().getName())
         print('thread work is done')
         print(self.email_message.to)
+        campaign_log_subscriber = CampaignsLogSubscriber(campaign=self.campaign, subscriber_email=self.email_message.to[0], is_sent=True)
+        campaign_log_subscriber.save()
+
         # try:
         #
         # except BadHeaderError:  # If mail's Subject is not properly formatted.
@@ -33,5 +36,3 @@ class EmailThread(threading.Thread):
 
     def stopped(self):
         return self._stop_event.is_set()
-
-

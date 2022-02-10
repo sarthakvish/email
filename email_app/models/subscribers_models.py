@@ -88,11 +88,20 @@ class CampaignsLogs(models.Model):
     #     ('EMAIL', 'Email'),
     # )
     # messenger = models.CharField(default="EMAIL", choices=MESSENGER_CHOICES, max_length=20)
-    is_completed = models.BooleanField(default=True)
+    is_completed = models.BooleanField(default=False)
 
     # is_started = models.BooleanField(default=True)
     def __str__(self):
         return self.campaign
+
+
+class CampaignsLogSubscriber(models.Model):
+    campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE)
+    subscriber_email = models.CharField(max_length=100)
+    is_sent = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.subscriber_email
 
 
 class SubscriberEmailData(models.Model):

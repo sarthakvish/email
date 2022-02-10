@@ -47,7 +47,7 @@ def getCampaignsSubscriber(request):
                                                   "att": 30},
                                                  {"name": "sarthak",
                                                   "att": 20}
-                                                 ]})
+                                                 ]}, campaign)
             # # time.sleep(5)
             thread_list = threading.enumerate()
             print('thread list', thread_list)
@@ -61,7 +61,7 @@ def getCampaignsSubscriber(request):
 
 # Function to make email message dynamically
 
-def get_template_to_send(user, email_subject, text_content, from_email, to, template_path, ctx):
+def get_template_to_send(user, email_subject, text_content, from_email, to, template_path, ctx, campaign):
     for obj in to:
         print("loop starting...")
         print(obj)
@@ -77,7 +77,7 @@ def get_template_to_send(user, email_subject, text_content, from_email, to, temp
         print('thread going to start after 2 second')
         # time.sleep(2)
 
-        t = EmailThread(email_message)
+        t = EmailThread(email_message, campaign)
         t.daemon = True
         t.start()
 
