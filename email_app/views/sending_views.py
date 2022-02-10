@@ -14,7 +14,7 @@ from email_app.serializers import TemplatesSerializer, GetListSerializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.mail import EmailMessage, EmailMultiAlternatives
-from email_app.thread_tasks import EmailThread, send_mail_thread
+from email_app.thread_tasks import EmailThread
 import requests
 import threading
 
@@ -49,8 +49,9 @@ def getCampaignsSubscriber(request):
                                                   "att": 20}
                                                  ]})
             # # time.sleep(5)
-            # thread_list=threading.enumerate()
-            # print('thread list', thread_list)
+            thread_list = threading.enumerate()
+            print('thread list', thread_list)
+
             return Response(unique_send_list, status=status.HTTP_200_OK)
         return Response('You do not have sufficient permission!')
     except ObjectDoesNotExist:
@@ -61,10 +62,8 @@ def getCampaignsSubscriber(request):
 # Function to make email message dynamically
 
 def get_template_to_send(user, email_subject, text_content, from_email, to, template_path, ctx):
-    print(to)
-    threads = []
-
     for obj in to:
+        print("loop starting...")
         print(obj)
         html = render_to_string(template_path, {"name": obj['name']})
 
@@ -75,16 +74,27 @@ def get_template_to_send(user, email_subject, text_content, from_email, to, temp
             to=[obj['email']],
         )
         email_message.attach_alternative(html, "text/html")
-        EmailThread(email_message).start()
+        print('thread going to start after 2 second')
+        # time.sleep(2)
 
-        # t1 = threading.Thread(target=send_mail_thread(email_message))
-        # t1.start()
-        # threads.append(t1)
-        # print("main thread")
-    # for thread in threads:
-    #     thread.join()
-    #     print('hello', thread.is_alive())
-    # time.sleep(5)
+        t = EmailThread(email_message)
+        t.daemon = True
+        t.start()
+
+        # EmailThread(email_message).start()
+        # time.sleep(5)
+
+        # Signal thread to finish
+        t.stop()
+
+        # # Wait for thread to finish
+        # t.join()
+
+        del t
+        # print("waiting for 2 second")
+        # time.sleep(2)
+        # print("waiting over, and moving to next loop element")
+    print(threading.active_count())
     return
 
 

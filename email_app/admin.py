@@ -1,6 +1,6 @@
 from django.contrib import admin
 from email_app.models.user_models import CompanyProfile, StaffUsers, StaffUsersExcelFile
-from email_app.models.subscribers_models import Subscribers, List, Template, Campaigns, GetList
+from email_app.models.subscribers_models import Subscribers, List, Template, Campaigns, GetList, CampaignsLogs
 
 
 # Register your models here.
@@ -27,6 +27,10 @@ class CampaignAdmin(admin.ModelAdmin):
     list_display = ['name', 'subject', 'from_email']
 
 
+class CampaignLogAdmin(admin.ModelAdmin):
+    list_display = ['company', 'campaign', 'log_date', 'is_completed']
+
+
 admin.site.register(CompanyProfile, CompanyProfileAdmin)
 admin.site.register(Subscribers, SubscribersAdmin)
 admin.site.register(StaffUsers, StaffAdmin)
@@ -35,4 +39,4 @@ admin.site.register(List)
 admin.site.register(Template)
 admin.site.register(GetList)
 admin.site.register(Campaigns, CampaignAdmin)
-
+admin.site.register(CampaignsLogs, CampaignLogAdmin)

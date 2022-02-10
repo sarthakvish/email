@@ -80,6 +80,21 @@ class Campaigns(models.Model):
         return self.name
 
 
+class CampaignsLogs(models.Model):
+    company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
+    campaign = models.ForeignKey(Campaigns, on_delete=models.CASCADE)
+    log_date = models.DateTimeField(auto_now_add=True)
+    # STATS_CHOICES = (
+    #     ('EMAIL', 'Email'),
+    # )
+    # messenger = models.CharField(default="EMAIL", choices=MESSENGER_CHOICES, max_length=20)
+    is_completed = models.BooleanField(default=True)
+
+    # is_started = models.BooleanField(default=True)
+    def __str__(self):
+        return self.campaign
+
+
 class SubscriberEmailData(models.Model):
     subscriber = models.ForeignKey(Subscribers, on_delete=models.CASCADE)
     date = models.DateField()
