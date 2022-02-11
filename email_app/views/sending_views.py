@@ -58,7 +58,7 @@ def getCampaignsSubscriber(request):
             return Response(unique_send_list, status=status.HTTP_200_OK)
         return Response('You do not have sufficient permission!')
     except ObjectDoesNotExist:
-        message = {'detail': 'You are not authorized to view campaign!'}
+        message = {'detail': 'You are not authorized to start campaign!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 

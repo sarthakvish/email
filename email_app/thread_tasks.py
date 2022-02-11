@@ -2,7 +2,7 @@ import threading
 import time
 from smtplib import SMTPException
 from django.core.mail import EmailMessage, BadHeaderError
-from email_app.models.subscribers_models import CampaignsLogSubscriber
+from email_app.models.subscribers_models import CampaignsLogSubscriber, CampaignsLogs
 
 
 class EmailThread(threading.Thread):
@@ -23,6 +23,14 @@ class EmailThread(threading.Thread):
             campaign_log_subscriber = CampaignsLogSubscriber(campaign_log=self.campaign_log,
                                                              subscriber_email=self.email_message.to[0], is_sent=True)
             campaign_log_subscriber.save()
+            print("iddd", self.campaign_log.id)
+            campaign_log_obj = CampaignsLogs.objects.get(id=self.campaign_log.id)
+            subscriber_count = campaign_log_obj.campaignslogsubscriber_set.all().count()
+            print("subcount",subscriber_count)
+            print('emailcount',campaign_log_obj.email_count)
+            if campaign_log_obj.email_count==subscriber_count:
+                campaign_log_obj.is_completed=True
+                campaign_log_obj.save()
 
         except BadHeaderError:  # If mail's Subject is not properly formatted.
             print('Invalid header found.')
