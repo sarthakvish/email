@@ -1,6 +1,7 @@
-from django.db.models.signals import pre_save, post_delete
+from django.db.models.signals import pre_save, post_delete, post_save
 from django.contrib.auth.models import User
 from email_app.models.user_models import StaffUsers
+from email_app.models.subscribers_models import CampaignsLogSubscriber, CampaignsLogs, Campaigns
 from django.dispatch import receiver
 
 
@@ -9,6 +10,11 @@ def updateUser(sender, instance, **kwargs):
     user = instance
     if user != '':
         user.username = user.email
+
+#
+# @receiver(post_save, sender=CampaignsLogs)
+# def updateCampaignLogs(sender, instance, **kwargs):
+#     print(CampaignsLogs.id, "id")
 
 
 # pre_save.connect(updateUser, sender=User)

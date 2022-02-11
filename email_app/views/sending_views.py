@@ -1,15 +1,13 @@
 import json
 import time
-
 from django.db.models import Q
 from django.template.loader import render_to_string
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from email_app.models.subscribers_models import Campaigns
 from email_app.models.user_models import CompanyProfile
-from email_app.models.subscribers_models import GetList
+from email_app.models.subscribers_models import GetList, CampaignsLogs, Campaigns
 from email_app.serializers import TemplatesSerializer, GetListSerializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
@@ -30,6 +28,7 @@ def getCampaignsSubscriber(request):
         if Campaigns.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
             campaign = Campaigns.objects.get(id=pk)
             campaign_lists = campaign.list.all()
+
             mail_sending_list = []
 
             for list_obj in campaign_lists:
@@ -39,6 +38,10 @@ def getCampaignsSubscriber(request):
                                               "name": subcriber.name})
             # unique_send_list = list(set(mail_sending_list))
             unique_send_list = list({v['email']: v for v in mail_sending_list}.values())
+
+            campaign_log = CampaignsLogs(company=company_obj, campaign=campaign, email_count=len(unique_send_list))
+            campaign_log.save()
+
             get_template_to_send(request.user, "hi all", "",
                                  settings.DEFAULT_FROM_EMAIL,
                                  unique_send_list, "email/hyber_dashboard.html",
@@ -47,7 +50,7 @@ def getCampaignsSubscriber(request):
                                                   "att": 30},
                                                  {"name": "sarthak",
                                                   "att": 20}
-                                                 ]}, campaign)
+                                                 ]}, campaign_log)
             # # time.sleep(5)
             thread_list = threading.enumerate()
             print('thread list', thread_list)
@@ -61,7 +64,7 @@ def getCampaignsSubscriber(request):
 
 # Function to make email message dynamically
 
-def get_template_to_send(user, email_subject, text_content, from_email, to, template_path, ctx, campaign):
+def get_template_to_send(user, email_subject, text_content, from_email, to, template_path, ctx, campaign_log):
     for obj in to:
         print("loop starting...")
         print(obj)
@@ -77,7 +80,7 @@ def get_template_to_send(user, email_subject, text_content, from_email, to, temp
         print('thread going to start after 2 second')
         # time.sleep(2)
 
-        t = EmailThread(email_message, campaign)
+        t = EmailThread(email_message, campaign_log)
         t.daemon = True
         t.start()
 
