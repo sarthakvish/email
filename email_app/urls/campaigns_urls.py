@@ -7,4 +7,6 @@ urlpatterns = [
     path('getCampaignById/', views.getCampaignById, name="campaign"),
     path('updateCampaignById/', views.updateCampaign, name="update_campaign"),
     path('deleteCampaignById/', views.deleteCampaignById, name="delete_campaign"),
+    path('getCampaignLogs/', views.getCampaignLogs, name="campaign_logs"),
+    path('getCampaignLogSubscribers/', views.getCampaignLogSubscribers, name="campaign_log_subscribers"),
 ]

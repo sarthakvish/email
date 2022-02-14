@@ -16,6 +16,7 @@ urlpatterns = [
                   path('api/lists/', include('email_app.urls.list_urls')),
                   path('api/campaigns/', include('email_app.urls.campaigns_urls')),
                   path('api/send/', include('email_app.urls.sending_urls')),
+                  path('api/analytics/', include('email_app.urls.analytical_urls')),
                   path('__debug__/', include(debug_toolbar.urls)),
                   path('ckeditor/', include('ckeditor_uploader.urls')),
                   path('ses/event-webhook/', SESEventWebhookView.as_view(), name='handle-event-webhook'),

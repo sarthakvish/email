@@ -4,10 +4,10 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from email_app.models.subscribers_models import List, Subscribers, Campaigns
+from email_app.models.subscribers_models import List, Subscribers, Campaigns, CampaignsLogs
 from email_app.models.user_models import CompanyProfile
 from taggit.models import Tag
-from email_app.serializers import CampaignSerializer, CampaignSerializerWithoutList
+from email_app.serializers import CampaignSerializer, CampaignSerializerWithoutList, CampaignLogsSerializer, CampaignLogSubscribersSerializer
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 
@@ -140,4 +140,42 @@ def deleteCampaignById(request):
         return Response('You do not have permission to delete this record ')
     except ObjectDoesNotExist:
         message = {'detail': 'You are not authorized to delete list'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def getCampaignLogs(request):
+    user = request.user
+    data = request.data
+    pk = data['id']
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        if Campaigns.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            campaign = Campaigns.objects.get(id=pk)
+            campaign_logs = campaign.campaignslogs_set.all()
+            serializer = CampaignLogsSerializer(campaign_logs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response('You do not have permission to view this record ')
+    except ObjectDoesNotExist:
+        message = {'detail': 'You are not authorized to view campaign logs'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def getCampaignLogSubscribers(request):
+    user = request.user
+    data = request.data
+    pk = data['id']
+    try:
+        company_obj = CompanyProfile.objects.get(user=user)
+        if CampaignsLogs.objects.filter(Q(id=pk) & Q(company=company_obj)).exists():
+            campaign_log = CampaignsLogs.objects.get(id=pk)
+            campaign_logs_subscribers = campaign_log.campaignslogsubscriber_set.all()
+            serializer = CampaignLogSubscribersSerializer(campaign_logs_subscribers, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response('You do not have permission to view this record ')
+    except ObjectDoesNotExist:
+        message = {'detail': 'You are not authorized to view campaign log related subscribers'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
