@@ -15,7 +15,6 @@ from django.db import IntegrityError
 @permission_classes([IsAuthenticated])
 def createSubscriber(request):
     user = request.user
-    print('sarthak', user)
     try:
         company_obj = CompanyProfile.objects.get(user=user)
         data = request.data
