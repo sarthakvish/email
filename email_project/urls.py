@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from email_app import update_subscriber_email_data
 
 urlpatterns = [
-                  path('admin/', admin.site.urls),
+                  path('adm/', admin.site.urls),
                   path('api/users/', include('email_app.urls.user_urls')),
                   path('api/staff/', include('email_app.urls.staff_urls')),
                   path('api/subscribers/', include('email_app.urls.subscribers_urls')),
