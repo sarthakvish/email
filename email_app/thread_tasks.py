@@ -36,8 +36,9 @@ class EmailThread(threading.Thread):
             print('Invalid header found.')
         except SMTPException as e:  # It will catch other errors related to SMTP.
             print('There was an error sending an email.' + e)
-        except:  # It will catch All other possible errors.
+        except Exception as e:  # It will catch All other possible errors.
             print("Mail Sending Failed!")
+            print(e)
             campaign_log_subscriber = CampaignsLogSubscriber(campaign_log=self.campaign_log,
                                                              subscriber_email=self.email_message.to[0], is_sent=False)
             campaign_log_subscriber.save()

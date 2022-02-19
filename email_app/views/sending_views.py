@@ -44,7 +44,7 @@ def getCampaignsSubscriber(request):
 
             get_template_to_send(request.user, "hi all", "",
                                  settings.DEFAULT_FROM_EMAIL,
-                                 unique_send_list, "email/hyber_dashboard.html",
+                                 unique_send_list, "email/update_hyper_dahboard.html",
                                  {"user": request.user,
                                   "attendance": [{"name": "kanchan",
                                                   "att": 30},
