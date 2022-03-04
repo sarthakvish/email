@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from email_app.models.user_models import CompanyProfile
-from email_app.models.subscribers_models import GetList, CampaignsLogs, Campaigns
+from email_app.models.subscribers_models import GetList, CampaignsLogs, Campaigns, We360SubscriberReportData
 from email_app.serializers import TemplatesSerializer, GetListSerializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
@@ -101,8 +101,56 @@ def get_template_to_send(user, email_subject, text_content, from_email, to, temp
     return
 
 
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def getWe360data(request):
+    user = request.user
+    data = request.data['data']
+    print(len(data))
+    try:
+        We360SubscriberReportData.objects.all().delete()
+        for item in data:
+            company_id = item['company_id']
+            company_name = item['company_name']
+            time_zone = item['time_zone']
+            total_users = item['total_users']
+            present_users = item['present_users']
+            current_productivity = item['current_productivity']
+            previous_productivity = item['previous_productivity']
+            productivity_difference = item['productivity_diff']
+            absent_users = item['absent_users']
+            present_percent = item['present_percent']
+            absent_percent = item['absent_percent']
+            healthy = item['healthy']
+            over_worked = item['over_worked']
+            under_utilised = item['under_utilised']
+            working_time = item['working_time']
+            active_time = item['active_time']
+            idle_time = item['idle_time']
+            break_time = item['break_time']
+            mail_to = item['mail_to']
+            attendance_csv_url = item['attendance_csv_url']
+            we360_report_data_instance = We360SubscriberReportData.objects.create(subscriber_id=company_id,
+                                                                                  subscriber_name=company_name,
+                                                                                  mail_to=mail_to, time_zone=time_zone,
+                                                                                  total_users=total_users,
+                                                                                  present_users=present_users,
+                                                                                  current_productivity=current_productivity,
+                                                                                  previous_productivity=previous_productivity,
+                                                                                  productivity_difference=productivity_difference,
+                                                                                  absent_users=absent_users, present_percent=present_percent,
+                                                                                  absent_percent=absent_percent, healthy=healthy, over_worked=over_worked,
+                                                                                  under_utilised=under_utilised, working_time=working_time, active_time=active_time,
+                                                                                  idle_time=idle_time, break_time=break_time, attendence_csv_url=attendance_csv_url)
+            we360_report_data_instance.save()
+        print('fetched data successfully')
+        return Response("fetched successfully")
+    except ObjectDoesNotExist:
+        message = {'detail': 'unsuccessfully'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def fetch_subscriber_data_by_api_wwe360():
     response = requests.get('https://jsonplaceholder.typicode.com/posts')
     data = json.loads(response.text)

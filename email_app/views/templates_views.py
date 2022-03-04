@@ -56,7 +56,7 @@ def getTemplateSourceCode(request):
             file = open(f"templates/{template.template}", 'r', encoding='utf-8')
             source_code = file.read()
             S = BeautifulSoup(source_code, 'html.parser')
-            print(source_code)
+            # print(source_code)
             context = {
                 'data': serializer.data,
                 'source': S.prettify(),

@@ -116,3 +116,29 @@ class GetList(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class We360SubscriberReportData(models.Model):
+    subscriber_id = models.PositiveIntegerField()
+    subscriber_name = models.CharField(max_length=100)
+    mail_to = models.CharField(max_length=255)
+    time_zone = models.CharField(max_length=100)
+    total_users = models.PositiveIntegerField()
+    present_users = models.PositiveIntegerField()
+    current_productivity = models.PositiveIntegerField()
+    previous_productivity = models.PositiveIntegerField()
+    productivity_difference = models.PositiveIntegerField()
+    absent_users = models.PositiveIntegerField()
+    present_percent = models.PositiveIntegerField()
+    absent_percent = models.PositiveIntegerField()
+    healthy = models.PositiveIntegerField()
+    over_worked = models.PositiveIntegerField()
+    under_utilised = models.PositiveIntegerField()
+    working_time = models.PositiveIntegerField()
+    active_time = models.PositiveIntegerField()
+    idle_time = models.PositiveIntegerField()
+    break_time = models.PositiveIntegerField()
+    attendence_csv_url = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.subscriber_name
