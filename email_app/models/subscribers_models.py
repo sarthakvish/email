@@ -4,6 +4,7 @@ from email_app.models.user_models import CompanyProfile
 from taggit.managers import TaggableManager
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
+from datetime import datetime
 
 
 class Subscribers(models.Model):
@@ -118,8 +119,9 @@ class GetList(models.Model):
         return self.title
 
 
-class We360SubscriberReportData(models.Model):
-    subscriber_id = models.PositiveIntegerField()
+class ReportDataWe360(models.Model):
+    subscriber = models.OneToOneField(Subscribers, default='daily', null=True, on_delete=models.SET_NULL)
+    subscriber_we360_id = models.PositiveIntegerField()
     subscriber_name = models.CharField(max_length=100)
     mail_to = models.CharField(max_length=255)
     time_zone = models.CharField(max_length=100)
@@ -139,6 +141,8 @@ class We360SubscriberReportData(models.Model):
     idle_time = models.PositiveIntegerField()
     break_time = models.PositiveIntegerField()
     attendence_csv_url = models.CharField(max_length=255)
+    report_date = models.CharField(max_length=100)
+    report_type = models.CharField(max_length=30)
 
     def __str__(self):
         return self.subscriber_name

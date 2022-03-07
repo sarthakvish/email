@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from email_app.models.user_models import CompanyProfile
-from email_app.models.subscribers_models import GetList, CampaignsLogs, Campaigns, We360SubscriberReportData
+from email_app.models.subscribers_models import GetList, CampaignsLogs, Campaigns, ReportDataWe360, Subscribers, \
+    CompanyProfile
 from email_app.serializers import TemplatesSerializer, GetListSerializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
@@ -36,6 +37,7 @@ def getCampaignsSubscriber(request):
                 for subcriber in subscribers:
                     mail_sending_list.append({"email": subcriber.email,
                                               "name": subcriber.name})
+                    print(subcriber.reportdatawe360.total_users)
             # unique_send_list = list(set(mail_sending_list))
             unique_send_list = list({v['email']: v for v in mail_sending_list}.values())
 
@@ -107,7 +109,7 @@ def getWe360data(request):
     data = request.data['data']
     print(len(data))
     try:
-        We360SubscriberReportData.objects.all().delete()
+        ReportDataWe360.objects.all().delete()
         for item in data:
             company_id = item['company_id']
             company_name = item['company_name']
@@ -129,23 +131,35 @@ def getWe360data(request):
             break_time = item['break_time']
             mail_to = item['mail_to']
             attendance_csv_url = item['attendance_csv_url']
-            we360_report_data_instance = We360SubscriberReportData.objects.create(subscriber_id=company_id,
-                                                                                  subscriber_name=company_name,
-                                                                                  mail_to=mail_to, time_zone=time_zone,
-                                                                                  total_users=total_users,
-                                                                                  present_users=present_users,
-                                                                                  current_productivity=current_productivity,
-                                                                                  previous_productivity=previous_productivity,
-                                                                                  productivity_difference=productivity_difference,
-                                                                                  absent_users=absent_users, present_percent=present_percent,
-                                                                                  absent_percent=absent_percent, healthy=healthy, over_worked=over_worked,
-                                                                                  under_utilised=under_utilised, working_time=working_time, active_time=active_time,
-                                                                                  idle_time=idle_time, break_time=break_time, attendence_csv_url=attendance_csv_url)
+            report_date = item['report_date']
+            report_type = item['report_type']
+            print(mail_to)
+            subscriber_obj = Subscribers.objects.get(email=mail_to)
+            we360_report_data_instance = ReportDataWe360.objects.create(subscriber=subscriber_obj,
+                                                                        subscriber_we360_id=company_id,
+                                                                        subscriber_name=company_name,
+                                                                        mail_to=mail_to, time_zone=time_zone,
+                                                                        total_users=total_users,
+                                                                        present_users=present_users,
+                                                                        current_productivity=current_productivity,
+                                                                        previous_productivity=previous_productivity,
+                                                                        productivity_difference=productivity_difference,
+                                                                        absent_users=absent_users,
+                                                                        present_percent=present_percent,
+                                                                        absent_percent=absent_percent, healthy=healthy,
+                                                                        over_worked=over_worked,
+                                                                        under_utilised=under_utilised,
+                                                                        working_time=working_time,
+                                                                        active_time=active_time,
+                                                                        idle_time=idle_time, break_time=break_time,
+                                                                        attendence_csv_url=attendance_csv_url,
+                                                                        report_date=report_date,
+                                                                        report_type=report_type)
             we360_report_data_instance.save()
         print('fetched data successfully')
         return Response("fetched successfully")
     except ObjectDoesNotExist:
-        message = {'detail': 'unsuccessfully'}
+        message = {'detail': 'Something went wrong, make sure your data is in correct format!'}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
